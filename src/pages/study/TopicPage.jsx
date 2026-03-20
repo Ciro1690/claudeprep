@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useProgress } from '../../hooks/useProgress'
 import { topics } from '../../data/curriculum/topics'
 import { categories } from '../../data/curriculum/categories'
+import ClaudeChat from '../../components/ClaudeChat'
 
 export default function TopicPage() {
   const { categoryId, topicId } = useParams()
@@ -55,6 +56,8 @@ export default function TopicPage() {
             <Section key={i} section={section} />
           ))}
         </div>
+
+        <ClaudeChat topic={topic} />
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex items-center justify-between">
           <Link
