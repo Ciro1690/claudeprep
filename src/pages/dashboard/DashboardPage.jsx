@@ -1,9 +1,16 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 export default function DashboardPage() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (profile && (!profile.language || !profile.experience)) {
+      navigate('/onboarding', { replace: true })
+    }
+  }, [profile, navigate])
 
   async function handleSignOut() {
     await signOut()
@@ -25,18 +32,14 @@ export default function DashboardPage() {
         <h2 className="text-2xl font-bold mb-1">Welcome back</h2>
         <p className="text-gray-400 text-sm mb-8">{user?.email}</p>
 
-        {!profile?.language && (
-          <div className="bg-blue-950 border border-blue-800 rounded-lg px-5 py-4 mb-8">
-            <p className="text-blue-200 text-sm font-medium">Complete your profile</p>
-            <p className="text-blue-400 text-sm mt-0.5">
-              Choose your language and experience level to get personalized content.
-            </p>
-            <button
-              onClick={() => navigate('/onboarding')}
-              className="mt-3 text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md transition-colors"
-            >
-              Get started →
-            </button>
+        {profile && (
+          <div className="flex gap-3 mb-8">
+            <span className="bg-gray-800 text-gray-300 text-sm px-3 py-1 rounded-full capitalize">
+              {profile.language}
+            </span>
+            <span className="bg-gray-800 text-gray-300 text-sm px-3 py-1 rounded-full capitalize">
+              {profile.experience}
+            </span>
           </div>
         )}
 
