@@ -8,6 +8,8 @@ import LoginPage from './pages/auth/LoginPage'
 import SignupPage from './pages/auth/SignupPage'
 import OnboardingPage from './pages/onboarding/OnboardingPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
+import TopicsPage from './pages/study/TopicsPage'
+import TopicPage from './pages/study/TopicPage'
 
 const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/dashboard" replace /> },
@@ -20,6 +22,14 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
+  },
+  {
+    path: '/study/:categoryId',
+    element: <ProtectedRoute><TopicsPage /></ProtectedRoute>,
+  },
+  {
+    path: '/study/:categoryId/:topicId',
+    element: <ProtectedRoute><TopicPage /></ProtectedRoute>,
   },
 ])
 
