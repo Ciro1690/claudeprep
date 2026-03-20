@@ -1,10 +1,14 @@
+import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
+import { useProgress } from '../../hooks/useProgress'
 import { topics } from '../../data/curriculum/topics'
 import { categories } from '../../data/curriculum/categories'
 
 export default function TopicPage() {
   const { categoryId, topicId } = useParams()
   const navigate = useNavigate()
+  const { isCompleted, markComplete, markIncomplete } = useProgress()
+  const [saving, setSaving] = useState(false)
 
   const topic = topics.find(t => t.id === topicId && t.category === categoryId)
   const category = categories.find(c => c.id === categoryId)
@@ -12,6 +16,15 @@ export default function TopicPage() {
   if (!topic) {
     navigate(`/study/${categoryId}`, { replace: true })
     return null
+  }
+
+  const done = isCompleted(topic.id)
+
+  async function handleToggle() {
+    setSaving(true)
+    if (done) await markIncomplete(topic.id)
+    else await markComplete(topic.id)
+    setSaving(false)
   }
 
   return (
@@ -50,6 +63,25 @@ export default function TopicPage() {
           >
             ← Back to {category?.title}
           </Link>
+
+          <button
+            onClick={handleToggle}
+            disabled={saving}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+              done
+                ? 'bg-green-900 border border-green-700 text-green-300 hover:bg-green-800'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            {done ? (
+              <>
+                <span>✓</span>
+                <span>Completed</span>
+              </>
+            ) : (
+              <span>Mark as complete</span>
+            )}
+          </button>
         </div>
       </main>
     </div>
@@ -77,7 +109,7 @@ function Section({ section }) {
       )}
       {section.type === 'code' && (
         <div className="rounded-lg overflow-hidden border border-gray-800">
-          <div className="bg-gray-900 px-4 py-2 flex items-center justify-between border-b border-gray-800">
+          <div className="bg-gray-900 px-4 py-2 flex items-center border-b border-gray-800">
             <span className="text-xs text-gray-500 font-mono">{section.language}</span>
           </div>
           <pre className="bg-gray-950 px-4 py-4 overflow-x-auto text-sm font-mono text-gray-200 leading-relaxed">

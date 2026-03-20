@@ -1,5 +1,6 @@
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useProgress } from '../../hooks/useProgress'
 import { categories } from '../../data/curriculum/categories'
 import { topics } from '../../data/curriculum/topics'
 
@@ -14,6 +15,7 @@ const LEVEL_COLORS = {
 export default function TopicsPage() {
   const { categoryId } = useParams()
   const { profile } = useAuth()
+  const { isCompleted } = useProgress()
   const navigate = useNavigate()
 
   const category = categories.find(c => c.id === categoryId)
@@ -35,6 +37,8 @@ export default function TopicsPage() {
     return acc
   }, {})
 
+  const completedCount = available.filter(t => isCompleted(t.id)).length
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-gray-800 px-6 py-4 flex items-center gap-4">
@@ -46,9 +50,16 @@ export default function TopicsPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">{category.title}</h1>
-          <p className="text-gray-400 text-sm mt-1">{category.description}</p>
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold">{category.title}</h1>
+            <p className="text-gray-400 text-sm mt-1">{category.description}</p>
+          </div>
+          {available.length > 0 && (
+            <span className="text-sm text-gray-400 shrink-0 mt-1">
+              {completedCount}/{available.length} done
+            </span>
+          )}
         </div>
 
         {available.length === 0 ? (
@@ -68,26 +79,44 @@ export default function TopicsPage() {
                   {level}
                 </h2>
                 <div className="space-y-2">
-                  {levelTopics.map(topic => (
-                    <Link
-                      key={topic.id}
-                      to={`/study/${categoryId}/${topic.id}`}
-                      className="flex items-center justify-between bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 rounded-lg px-4 py-3.5 transition-colors group"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-white group-hover:text-blue-300 transition-colors">
-                          {topic.title}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{topic.summary}</p>
-                      </div>
-                      <div className="flex items-center gap-3 ml-4 shrink-0">
-                        <span className="text-xs text-gray-600">{topic.estimatedMinutes} min</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${LEVEL_COLORS[topic.level]}`}>
-                          {topic.level}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
+                  {levelTopics.map(topic => {
+                    const done = isCompleted(topic.id)
+                    return (
+                      <Link
+                        key={topic.id}
+                        to={`/study/${categoryId}/${topic.id}`}
+                        className={`flex items-center justify-between border rounded-lg px-4 py-3.5 transition-colors group ${
+                          done
+                            ? 'bg-gray-900/50 border-gray-800 opacity-70'
+                            : 'bg-gray-900 border-gray-800 hover:bg-gray-800 hover:border-gray-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`shrink-0 w-5 h-5 rounded-full border flex items-center justify-center text-xs ${
+                            done
+                              ? 'border-green-600 bg-green-900 text-green-400'
+                              : 'border-gray-700 text-transparent'
+                          }`}>
+                            ✓
+                          </span>
+                          <div>
+                            <p className={`text-sm font-medium transition-colors ${
+                              done ? 'text-gray-400' : 'text-white group-hover:text-blue-300'
+                            }`}>
+                              {topic.title}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">{topic.summary}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 ml-4 shrink-0">
+                          <span className="text-xs text-gray-600">{topic.estimatedMinutes} min</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${LEVEL_COLORS[topic.level]}`}>
+                            {topic.level}
+                          </span>
+                        </div>
+                      </Link>
+                    )
+                  })}
                 </div>
               </div>
             ))}
