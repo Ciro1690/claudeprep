@@ -48,6 +48,10 @@ export function AuthProvider({ children }) {
     })
   }
 
+  async function signInAsGuest() {
+    return supabase.auth.signInAnonymously()
+  }
+
   async function signOut() {
     return supabase.auth.signOut()
   }
@@ -64,7 +68,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signInWithGoogle, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signInWithGoogle, signInAsGuest, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

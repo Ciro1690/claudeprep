@@ -33,8 +33,9 @@ const LEVELS = [
 export default function OnboardingPage() {
   const { user, profile, updateProfile } = useAuth()
   const navigate = useNavigate()
-  const [step, setStep] = useState(1)
-  const [handle, setHandle] = useState('')
+  const isGuest = user?.is_anonymous
+  const [step, setStep] = useState(isGuest ? 2 : 1)
+  const [handle, setHandle] = useState(isGuest ? 'Guest' : '')
   const [language, setLanguage] = useState(null)
   const [experience, setExperience] = useState(null)
   const [error, setError] = useState(null)
@@ -63,7 +64,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg">
         {/* Progress */}
         <div className="flex items-center gap-2 mb-10">
-          {[1, 2, 3].map(n => (
+          {(isGuest ? [2, 3] : [1, 2, 3]).map(n => (
             <div
               key={n}
               className={`h-1 flex-1 rounded-full transition-colors ${
@@ -85,7 +86,7 @@ export default function OnboardingPage() {
           <StepLanguage
             selected={language}
             setSelected={setLanguage}
-            onBack={() => setStep(1)}
+            onBack={isGuest ? null : () => setStep(1)}
             onNext={() => setStep(3)}
           />
         )}
@@ -155,12 +156,14 @@ function StepLanguage({ selected, setSelected, onBack, onNext }) {
         ))}
       </div>
       <div className="flex gap-3">
-        <button
-          onClick={onBack}
-          className="flex-1 border border-gray-700 hover:border-gray-500 text-gray-300 font-medium py-2.5 rounded-lg transition-colors"
-        >
-          ← Back
-        </button>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex-1 border border-gray-700 hover:border-gray-500 text-gray-300 font-medium py-2.5 rounded-lg transition-colors"
+          >
+            ← Back
+          </button>
+        )}
         <button
           onClick={onNext}
           disabled={!selected}

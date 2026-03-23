@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 export default function LoginPage() {
-  const { user, signIn, signInWithGoogle } = useAuth()
+  const { user, signIn, signInWithGoogle, signInAsGuest, signOut } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -98,6 +98,22 @@ export default function LoginPage() {
             Sign up
           </Link>
         </p>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-800" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-gray-950 px-3 text-gray-600">just browsing?</span>
+          </div>
+        </div>
+
+        <button
+          onClick={async () => { await signOut(); const { error } = await signInAsGuest(); if (error) setError(error.message) }}
+          className="w-full border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200 font-medium py-2.5 rounded-lg transition-colors text-sm"
+        >
+          Continue as guest
+        </button>
       </div>
     </div>
   )

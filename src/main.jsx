@@ -10,6 +10,7 @@ import OnboardingPage from './pages/onboarding/OnboardingPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import TopicsPage from './pages/study/TopicsPage'
 import TopicPage from './pages/study/TopicPage'
+import SettingsPage from './pages/settings/SettingsPage'
 
 const router = createBrowserRouter([
   { path: '/', element: <Navigate to="/dashboard" replace /> },
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: <ProtectedRoute><DashboardPage /></ProtectedRoute>,
+  },
+  {
+    path: '/settings',
+    element: <ProtectedRoute><SettingsPage /></ProtectedRoute>,
   },
   {
     path: '/study/:categoryId',

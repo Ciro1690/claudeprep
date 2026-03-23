@@ -45,23 +45,40 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <span className="text-lg font-semibold tracking-tight">claudeprep</span>
+        {profile?.language && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 bg-gray-900 border border-gray-700 px-2.5 py-1 rounded-full capitalize">{profile.language}</span>
+            <span className="text-xs text-gray-400 bg-gray-900 border border-gray-700 px-2.5 py-1 rounded-full capitalize">{profile.experience}</span>
+          </div>
+        )}
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-400">
-            {profile?.language && `${profile.language} · ${profile.experience}`}
-          </span>
-          <button onClick={handleSignOut} className="text-sm text-gray-400 hover:text-white transition-colors">
-            Sign out
-          </button>
+          <Link to="/settings" className="text-sm text-gray-400 hover:text-white transition-colors">
+            Settings
+          </Link>
+          {!user?.is_anonymous && (
+            <button onClick={handleSignOut} className="text-sm text-gray-400 hover:text-white transition-colors">
+              Sign out
+            </button>
+          )}
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-10">
+        {user?.is_anonymous && (
+          <div className="mb-6 flex items-center justify-between bg-gray-900 border border-gray-700 rounded-lg px-4 py-3">
+            <p className="text-sm text-gray-400">You're browsing as a guest — progress won't be saved.</p>
+            <Link to="/signup" className="text-sm text-blue-400 hover:text-blue-300 shrink-0 ml-4">
+              Create account →
+            </Link>
+          </div>
+        )}
+
         <div className="flex items-start justify-between mb-10">
           <div>
             <h2 className="text-2xl font-bold">Hey, {displayName} 👋</h2>
             <p className="text-gray-400 mt-1 text-sm">Pick a category to start studying.</p>
           </div>
-          {!progressLoading && (
+          {!progressLoading && !user?.is_anonymous && (
             <div className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3">
               <span className="text-2xl">🔥</span>
               <div>
