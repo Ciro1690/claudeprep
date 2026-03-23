@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
   async function signInWithGoogle() {
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/dashboard`, queryParams: { prompt: 'select_account' } },
     })
   }
 

@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [checkEmail, setCheckEmail] = useState(false)
 
   useEffect(() => {
-    if (user) navigate('/onboarding', { replace: true })
+    if (user && !user.is_anonymous) navigate('/onboarding', { replace: true })
   }, [user, navigate])
 
   async function handleSubmit(e) {
@@ -43,6 +43,12 @@ export default function SignupPage() {
             We sent a confirmation link to <span className="text-white">{email}</span>.
             Click it to activate your account.
           </p>
+          <button
+            onClick={() => setCheckEmail(false)}
+            className="mt-6 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            ← Back
+          </button>
         </div>
       </div>
     )
