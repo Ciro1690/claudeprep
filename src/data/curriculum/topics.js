@@ -4014,4 +4014,112 @@ asyncio.run(main())
       },
     ],
   },
+
+  {
+    id: 'systems-design-interview',
+    title: 'How to Ace a Systems Design Interview',
+    category: 'systems-design',
+    level: 'intermediate',
+    languages: null,
+    estimatedMinutes: 30,
+    summary: 'A step-by-step framework for structuring your answer, asking the right questions, and communicating your design clearly.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'What interviewers are actually evaluating',
+        body: 'Systems design interviews are not about finding a single correct answer — there is none. Interviewers evaluate how you think: do you ask clarifying questions before diving in? Do you reason about trade-offs? Can you communicate a complex architecture clearly? Do you know when to go deep vs. stay high-level? The framework below gives you a repeatable structure so you spend mental energy on the right things.',
+      },
+      {
+        type: 'bullets',
+        heading: 'The 4-step framework',
+        items: [
+          '1. Clarify requirements (~5 min) — nail down scope before touching the design',
+          '2. Estimate scale (~5 min) — back-of-envelope numbers that drive your decisions',
+          '3. High-level design (~15 min) — boxes and arrows, major components, data flow',
+          '4. Deep dives (~15 min) — go deep on the parts the interviewer cares about most',
+        ],
+      },
+      {
+        type: 'paragraph',
+        heading: 'Step 1: Clarify requirements',
+        body: 'Never start designing immediately. Spend the first few minutes asking questions to scope the problem. Interviewers intentionally leave prompts vague ("design Twitter") to see if you\'ll blindly over-engineer or smartly scope down.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Questions to ask in step 1',
+        items: [
+          'Who are the users and what is the core user action? (e.g., post a tweet, view a feed)',
+          'What scale are we targeting? (100 users? 100 million?)',
+          'Read-heavy or write-heavy? (a news feed is read-heavy; a logging system is write-heavy)',
+          'What are the latency requirements? (real-time vs. eventually consistent is fine)',
+          'What are we NOT building? (explicitly out-of-scope features save you from rabbit holes)',
+        ],
+      },
+      {
+        type: 'paragraph',
+        heading: 'Step 2: Estimate scale',
+        body: 'Quick back-of-envelope math anchors your design decisions. You don\'t need precision — orders of magnitude are enough. The goal is to know whether you\'re building for 1,000 requests/second or 1,000,000, because that determines whether you need sharding, a CDN, a message queue, etc.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Useful numbers to know',
+        items: [
+          '1 million DAU × 10 actions/day = ~115 requests/second (low traffic)',
+          '100 million DAU × 10 actions/day = ~11,500 requests/second (needs serious scaling)',
+          'A single database server handles ~10,000 reads/sec comfortably',
+          '1 TB = 1,000 GB; storing 1 byte per user per day for 1B users = ~365 GB/year',
+          'A typical API response is 1–10 KB; a photo is 100 KB–1 MB; a video is 100 MB–1 GB',
+        ],
+      },
+      {
+        type: 'paragraph',
+        heading: 'Step 3: High-level design',
+        body: 'Draw the major components and how data flows between them. Start with the client, add an API layer, then storage. Think in terms of: where does data come in, where is it stored, how is it retrieved. Speak out loud as you draw — interviewers want to follow your reasoning, not guess at your diagram.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Standard components to consider',
+        items: [
+          'Load balancer — distributes traffic across API servers',
+          'API servers — stateless; horizontally scalable',
+          'Primary database — source of truth (SQL or NoSQL depending on data model)',
+          'Cache (Redis) — reduces database load for hot reads',
+          'CDN — serves static assets and media at the edge',
+          'Object storage (S3) — stores user-uploaded files',
+          'Message queue (Kafka/SQS) — decouples async processing',
+          'Search index (Elasticsearch) — powers text/relevance search',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Step 4: Deep dives',
+        body: 'After the high-level design, the interviewer will steer you toward the interesting parts. Common deep dive areas:',
+        items: [
+          'Database schema — what tables/collections, what indexes, how do you avoid N+1 queries?',
+          'Feed generation — fan-out on write (push) vs. fan-out on read (pull) trade-offs',
+          'Handling hotspots — what happens when one user has 10M followers?',
+          'Failure modes — what happens when the database is unavailable? The cache is cold?',
+          'Consistency guarantees — do users need to read their own writes immediately?',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Communication tips',
+        items: [
+          'Say what you\'re drawing before you draw it — keep the interviewer oriented',
+          'State assumptions explicitly: "I\'m assuming this is read-heavy, so I\'ll add a cache"',
+          'Mention trade-offs rather than presenting one choice as obviously correct',
+          'Check in periodically: "Does this direction make sense, or should I focus elsewhere?"',
+          'If you don\'t know something, say so and reason from first principles',
+        ],
+      },
+    ],
+    practiceQuestions: [
+      'Design a URL shortener like bit.ly. Users can shorten a URL and share it; clicking the short URL redirects to the original.',
+      'Design a social media feed like Twitter. Users can post tweets and see a feed of tweets from people they follow.',
+      'Design a file storage and sharing service like Dropbox. Users can upload, sync, and share files across devices.',
+      'Design a video streaming platform like YouTube. Users can upload videos and stream them on demand.',
+      'Design a ride-sharing app like Uber. Riders can request a ride; nearby drivers accept and navigate to the pickup.',
+    ],
+  },
 ]

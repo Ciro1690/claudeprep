@@ -20,7 +20,20 @@ export default function BehavioralPractice({ topic }) {
     setFeedback(null)
     setError(null)
 
-    const prompt = `I'm practicing for a behavioral interview. The question was: "${questions[selected]}"
+    const isSystemsDesign = topic.category === 'systems-design'
+
+    const prompt = isSystemsDesign
+      ? `I'm practicing for a systems design interview. The question was: "${questions[selected]}"
+
+My design approach:
+${text}
+
+Please give me specific, actionable feedback on this systems design answer. Cover:
+- What's good about this approach
+- Key components, trade-offs, or considerations that are missing
+- Any scalability, reliability, or performance concerns
+- One concrete suggestion for what to address first`
+      : `I'm practicing for a behavioral interview. The question was: "${questions[selected]}"
 
 My answer:
 ${text}
@@ -49,10 +62,16 @@ Please give me specific, actionable coaching on how to strengthen this answer. C
     setError(null)
   }
 
+  const isSystemsDesign = topic.category === 'systems-design'
+
   return (
     <div className="mt-12 pt-8 border-t border-gray-800">
       <h2 className="text-lg font-semibold text-white mb-1">Practice Questions</h2>
-      <p className="text-sm text-gray-400 mb-5">Pick a question, write your answer, and get coaching from Claude.</p>
+      <p className="text-sm text-gray-400 mb-5">
+        {isSystemsDesign
+          ? 'Pick a design prompt, walk through your approach, and get feedback from Claude.'
+          : 'Pick a question, write your answer, and get coaching from Claude.'}
+      </p>
 
       <div className="rounded-xl border border-gray-800 bg-gray-900 p-6">
         {/* Question picker */}
@@ -86,7 +105,7 @@ Please give me specific, actionable coaching on how to strengthen this answer. C
               <textarea
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
-                placeholder="Write your answer here..."
+                placeholder={isSystemsDesign ? 'Walk through your design approach...' : 'Write your answer here...'}
                 rows={6}
                 disabled={loading}
                 className="w-full bg-gray-950 border border-gray-700 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 resize-none"
