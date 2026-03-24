@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (user && !user.is_anonymous) navigate('/dashboard', { replace: true })
+    if (user) navigate('/dashboard', { replace: true })
   }, [user, navigate])
 
   async function handleSubmit(e) {

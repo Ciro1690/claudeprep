@@ -21,15 +21,15 @@ function getAvailableTopics(categoryId, profile) {
 }
 
 export default function DashboardPage() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, loading: authLoading, signOut } = useAuth()
   const { streak, completedIds, loading: progressLoading } = useProgress()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (profile && !profile.language) {
+    if (!authLoading && !profile?.language) {
       navigate('/onboarding', { replace: true })
     }
-  }, [profile, navigate])
+  }, [authLoading, profile, navigate])
 
   async function handleSignOut() {
     await signOut()
