@@ -109,8 +109,8 @@ export default function DashboardPage() {
           </Link>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          {categories.filter(c => !c.languageSpecific).map(cat => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {categories.map(cat => {
             const style = CATEGORY_STYLES[cat.id]
             const available = getAvailableTopics(cat.id, profile)
             const completed = available.filter(t => completedIds.has(t.id)).length
@@ -126,46 +126,12 @@ export default function DashboardPage() {
                   <span className={`text-xs font-semibold uppercase tracking-wider ${style.text}`}>
                     {cat.title}
                   </span>
-                  <span className="text-xs text-gray-500">{completed}/{available.length}</span>
-                </div>
-                <p className="text-gray-300 text-sm mb-4">{cat.description}</p>
-                <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${style.bar}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-3">
-            Your language track
-          </p>
-          {categories.filter(c => c.languageSpecific).map(cat => {
-            const style = CATEGORY_STYLES[cat.id]
-            const available = getAvailableTopics(cat.id, profile)
-            const completed = available.filter(t => completedIds.has(t.id)).length
-            const pct = available.length ? Math.round((completed / available.length) * 100) : 0
-
-            return (
-              <Link
-                key={cat.id}
-                to={`/study/${cat.id}`}
-                className={`block rounded-xl border ${style.border} ${style.bg} p-5 hover:brightness-110 transition-all`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${style.text}`}>
-                    {cat.title}
-                    {profile?.language && (
-                      <span className="ml-2 font-normal normal-case text-gray-500 capitalize">
-                        · {profile.language}
-                      </span>
+                  <div className="flex items-center gap-2">
+                    {cat.languageSpecific && profile?.language && (
+                      <span className="text-xs text-gray-600 capitalize">{profile.language}</span>
                     )}
-                  </span>
-                  <span className="text-xs text-gray-500">{completed}/{available.length}</span>
+                    <span className="text-xs text-gray-500">{completed}/{available.length}</span>
+                  </div>
                 </div>
                 <p className="text-gray-300 text-sm mb-4">{cat.description}</p>
                 {available.length > 0 ? (
@@ -175,10 +141,12 @@ export default function DashboardPage() {
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                ) : (
+                ) : cat.languageSpecific ? (
                   <p className="text-xs text-gray-600 italic">
                     {profile?.language ? `No topics yet for ${profile.language}` : 'Set your language in Settings'}
                   </p>
+                ) : (
+                  <div className="h-1 bg-gray-800 rounded-full overflow-hidden" />
                 )}
               </Link>
             )
