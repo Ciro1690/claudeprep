@@ -3299,4 +3299,719 @@ asyncio.run(main())
       },
     ],
   },
+
+  {
+    id: 'cdn',
+    title: 'CDNs & Content Delivery',
+    category: 'systems-design',
+    level: 'beginner',
+    languages: null,
+    estimatedMinutes: 15,
+    summary: 'Serve static assets and cached responses from edge servers close to users to reduce latency.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'A Content Delivery Network (CDN) is a globally distributed network of servers (edge nodes) that caches content close to end users. Instead of every request travelling to your origin server, a CDN serves cached copies from the nearest edge location — dramatically reducing latency for static files, images, videos, and even API responses.',
+      },
+      {
+        type: 'bullets',
+        heading: 'What CDNs cache',
+        items: [
+          'Static assets: images, CSS, JavaScript, fonts — the primary use case',
+          'Video/audio: streaming platforms rely entirely on CDNs for delivery',
+          'API responses: cacheable GET responses (e.g., public product listings)',
+          'Entire HTML pages: for mostly-static sites (e.g., marketing pages)',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Key concepts',
+        items: [
+          'Origin server: your actual application server — CDN pulls from here on cache miss',
+          'Edge node / PoP (Point of Presence): CDN server in a geographic region',
+          'Cache hit vs miss: hit means served from edge; miss fetches from origin and caches',
+          'TTL (Time to Live): how long an edge node keeps a cached copy before revalidating',
+          'Cache invalidation: purging stale content from edge nodes after a deploy',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'When to bring up CDNs in an interview',
+        items: [
+          'Any system serving media (images, video, audio) at scale',
+          'Global user base — CDN reduces latency for users far from your origin',
+          'High read traffic on static or rarely-changing content',
+          'Reducing load on origin servers (CDN absorbs the majority of traffic)',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the primary purpose of a CDN?',
+        options: [
+          'To store application databases closer to users',
+          'To serve cached content from servers geographically close to the user',
+          'To compress data before sending it over the network',
+          'To encrypt traffic between client and server',
+        ],
+        answer: 1,
+        explanation: 'CDNs reduce latency by caching content at edge nodes close to users. Instead of requests travelling to a central origin server, users get responses from the nearest PoP.',
+      },
+      {
+        question: 'What happens on a CDN cache miss?',
+        options: [
+          'The request fails and returns a 404',
+          'The CDN fetches the content from the origin server, caches it, and returns it',
+          'The user is redirected to the origin server directly',
+          'The CDN returns stale content from another edge node',
+        ],
+        answer: 1,
+        explanation: 'On a cache miss the edge node forwards the request to the origin, stores the response for future requests, and returns it to the user. Subsequent requests from nearby users will be cache hits.',
+      },
+      {
+        question: 'What does TTL control in a CDN?',
+        options: [
+          'How long a user session stays active',
+          'How many requests per second the CDN handles',
+          'How long an edge node keeps a cached copy before revalidating with the origin',
+          'The maximum file size the CDN will cache',
+        ],
+        answer: 2,
+        explanation: 'TTL (Time to Live) is the duration an edge node serves cached content without checking the origin. Short TTL = fresher content but more origin load. Long TTL = better cache hit rate but potentially stale content.',
+      },
+      {
+        question: 'Which type of content benefits most from CDN caching?',
+        options: [
+          'User-specific API responses (e.g., /api/me)',
+          'Real-time database writes',
+          'Static assets like images, JS, and CSS that rarely change',
+          'Encrypted private messages',
+        ],
+        answer: 2,
+        explanation: 'Static assets are identical for every user and change infrequently — perfect for caching. User-specific or frequently-changing dynamic content has poor cache hit rates and is a poor fit.',
+      },
+      {
+        question: 'Why is cache invalidation considered one of the hardest problems in systems design?',
+        options: [
+          'CDN APIs are poorly documented',
+          'It is impossible to delete content from edge nodes',
+          'Determining when cached content is stale and purging it across all edge nodes reliably is complex',
+          'Cache invalidation only works for databases, not CDNs',
+        ],
+        answer: 2,
+        explanation: 'Edge nodes are distributed globally. Knowing when to invalidate, propagating the purge quickly to all nodes, and handling race conditions (new requests arriving during invalidation) makes this genuinely hard to get right.',
+      },
+    ],
+  },
+
+  {
+    id: 'object-storage',
+    title: 'Blob & Object Storage',
+    category: 'systems-design',
+    level: 'beginner',
+    languages: null,
+    estimatedMinutes: 15,
+    summary: 'Store large unstructured files cheaply and durably using object storage like S3.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Object storage (also called blob storage) is designed for large, unstructured files — images, videos, backups, logs, and documents. Unlike a database, you store and retrieve objects by a unique key. Services like Amazon S3, Google Cloud Storage, and Azure Blob Storage offer virtually unlimited capacity with high durability (typically 99.999999999% — "11 nines").',
+      },
+      {
+        type: 'bullets',
+        heading: 'Object storage vs a database',
+        items: [
+          'Databases: structured data, queryable, transactional — not for large binary files',
+          'Object storage: unstructured blobs, accessed by key — cheap at scale, not queryable',
+          'Common pattern: store the file in S3, store the S3 URL in your database',
+          'You would never store a 100 MB video in a database row',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Key features',
+        items: [
+          'Flat namespace: objects are stored in buckets with a unique key (no true folders)',
+          'Durability: data is replicated across multiple availability zones automatically',
+          'Lifecycle policies: automatically move old objects to cheaper storage tiers or delete them',
+          'Pre-signed URLs: generate a time-limited URL so clients can upload/download directly',
+          'Access control: make objects public (CDN-served) or private (signed URLs required)',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'When to mention it in an interview',
+        items: [
+          'Any system that handles user-uploaded files (photos, videos, documents)',
+          'Storing backups, logs, or data exports',
+          'Media pipelines: upload to S3 → trigger processing → store result back to S3',
+          'Pair with a CDN: S3 as origin, CloudFront/CDN as the delivery layer',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the correct way to store a user-uploaded profile photo in a typical web application?',
+        options: [
+          'Store the binary data directly in a database BLOB column',
+          'Store the file on the application server\'s local disk',
+          'Store the file in object storage (e.g., S3) and save the URL in the database',
+          'Convert the image to Base64 and store it as a text column',
+        ],
+        answer: 2,
+        explanation: 'Storing large binary files in a database is expensive and slow. Object storage is optimized for blobs — cheap, durable, scalable. The database stores the URL/key to reference the file.',
+      },
+      {
+        question: 'What is a pre-signed URL in object storage?',
+        options: [
+          'A URL that never expires for public assets',
+          'A time-limited URL that grants temporary access to upload or download an object',
+          'A CDN URL that is cached at the edge',
+          'A URL that bypasses authentication entirely',
+        ],
+        answer: 1,
+        explanation: 'Pre-signed URLs allow clients to upload or download directly to/from object storage without routing through your application server — reducing load and enabling direct browser-to-S3 uploads.',
+      },
+      {
+        question: 'What does "11 nines" durability mean for object storage?',
+        options: [
+          '99.99999999999% uptime guarantee',
+          '99.999999999% probability that a stored object will not be lost',
+          'Objects are stored in 11 geographic regions',
+          'The storage system can handle 11 billion requests per second',
+        ],
+        answer: 1,
+        explanation: '11 nines (99.999999999%) durability means the chance of losing a stored object in a given year is approximately 1 in 100 billion. This is achieved by replicating data across multiple availability zones.',
+      },
+      {
+        question: 'What is the typical pattern for combining object storage with a CDN?',
+        options: [
+          'CDN stores the metadata; object storage serves the files directly',
+          'Object storage is the origin; the CDN caches and delivers files to users',
+          'Object storage replaces the CDN entirely',
+          'CDN writes files to object storage on behalf of the client',
+        ],
+        answer: 1,
+        explanation: 'Object storage (S3) acts as the durable source of truth and CDN origin. The CDN caches files at edge nodes for fast delivery. Users get CDN speed; object storage provides durability and cost-effective storage.',
+      },
+      {
+        question: 'Why is it a bad idea to store large files on an application server\'s local disk?',
+        options: [
+          'Local disks are too fast for large files',
+          'Files are lost if the server is replaced or scaled to multiple instances',
+          'Application servers do not support file storage',
+          'Local disk storage is more expensive than object storage',
+        ],
+        answer: 1,
+        explanation: 'Local disk storage does not survive server replacements or auto-scaling events. With multiple instances, uploaded files are only on one server. Object storage is shared, durable, and decoupled from your compute layer.',
+      },
+    ],
+  },
+
+  {
+    id: 'message-queues',
+    title: 'Message Queues & Async Communication',
+    category: 'systems-design',
+    level: 'intermediate',
+    languages: null,
+    estimatedMinutes: 25,
+    summary: 'Decouple services and handle spiky workloads by passing messages through a durable queue.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'A message queue is a buffer between services. The producer writes a message to the queue; the consumer reads and processes it independently. This decouples the two services — the producer does not wait for the consumer to finish, and the consumer processes at its own pace. Common systems include RabbitMQ, Amazon SQS, and Apache Kafka.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Why use a queue?',
+        items: [
+          'Decoupling: producer and consumer can be deployed, scaled, and fail independently',
+          'Load leveling: absorb traffic spikes so consumers process at a steady rate',
+          'Durability: messages are persisted — if the consumer crashes, messages are not lost',
+          'Retry logic: failed messages can be requeued automatically',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Queue vs stream (Kafka)',
+        items: [
+          'Queue (SQS, RabbitMQ): each message is consumed once and deleted — point-to-point',
+          'Stream (Kafka): messages are retained as a log — multiple consumers can independently replay the same events',
+          'Use a queue for task distribution (one worker handles each job)',
+          'Use a stream for event sourcing, audit logs, or fan-out to multiple consumers',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Common patterns',
+        items: [
+          'Fan-out: one event triggers multiple consumers (e.g., order placed → notify, bill, update inventory)',
+          'Dead letter queue (DLQ): messages that fail repeatedly are routed here for inspection',
+          'At-least-once delivery: the queue may deliver a message more than once — make consumers idempotent',
+          'Backpressure: slow consumers cause the queue to grow — monitor queue depth as a key metric',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the main benefit of introducing a message queue between two services?',
+        options: [
+          'It makes the communication faster by reducing network hops',
+          'It decouples the producer and consumer so they can scale and fail independently',
+          'It ensures messages are delivered in strict order',
+          'It replaces the need for a database',
+        ],
+        answer: 1,
+        explanation: 'Decoupling is the core benefit. The producer writes to the queue without waiting for the consumer. The consumer processes at its own rate. Neither service needs to know the other exists directly.',
+      },
+      {
+        question: 'What does "at-least-once delivery" mean and what must consumers do to handle it?',
+        options: [
+          'Every message is delivered exactly once — consumers need no special handling',
+          'Messages may be delivered more than once — consumers must be idempotent',
+          'Messages are delivered at least once per minute regardless of traffic',
+          'The queue guarantees delivery only if the consumer is online',
+        ],
+        answer: 1,
+        explanation: 'At-least-once means the queue retries until it gets an acknowledgement, but network issues can cause duplicates. Consumers must be idempotent — processing the same message twice must produce the same result as processing it once.',
+      },
+      {
+        question: 'What is a Dead Letter Queue (DLQ)?',
+        options: [
+          'A queue that has been shut down',
+          'A queue for high-priority messages',
+          'A queue where messages are sent after failing to process successfully after several retries',
+          'A queue for messages older than 24 hours',
+        ],
+        answer: 2,
+        explanation: 'A DLQ captures messages that have failed processing repeatedly. This prevents bad messages from blocking the main queue indefinitely and allows engineers to inspect failures without losing the data.',
+      },
+      {
+        question: 'What is the key difference between a message queue (SQS) and a message stream (Kafka)?',
+        options: [
+          'Kafka is faster; SQS is more reliable',
+          'Queue messages are consumed once and deleted; stream messages are retained and can be replayed by multiple consumers',
+          'SQS supports fan-out; Kafka does not',
+          'Kafka requires a database; SQS does not',
+        ],
+        answer: 1,
+        explanation: 'Queues are point-to-point: one consumer processes each message and it is removed. Streams retain the message log so multiple independent consumers can read the same events at different offsets — essential for event sourcing and audit trails.',
+      },
+      {
+        question: 'You notice the queue depth growing continuously. What does this indicate?',
+        options: [
+          'Producers are publishing too few messages',
+          'The queue is functioning normally',
+          'Consumers are processing messages faster than producers publish them',
+          'Consumers cannot keep up with the rate of incoming messages',
+        ],
+        answer: 3,
+        explanation: 'A growing queue depth means consumers are falling behind. This is called backpressure. The solution is typically to scale out consumers, optimize processing time, or reduce producer rate.',
+      },
+    ],
+  },
+
+  {
+    id: 'rate-limiting',
+    title: 'Rate Limiting',
+    category: 'systems-design',
+    level: 'intermediate',
+    languages: null,
+    estimatedMinutes: 20,
+    summary: 'Protect your system from abuse and overload by capping how many requests a client can make in a time window.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Rate limiting controls how many requests a client can make to your API within a given time window. It protects against abuse (scraping, brute-force attacks), prevents one user from degrading service for others, and helps manage infrastructure costs. Rate limiting is typically enforced at the API gateway or a dedicated middleware layer.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Common algorithms',
+        items: [
+          'Fixed window: count requests in a fixed time bucket (e.g., 100 req/min). Simple but susceptible to burst at window boundary.',
+          'Sliding window: track request timestamps over a rolling window — smoother and more accurate than fixed window.',
+          'Token bucket: a bucket fills with tokens at a steady rate; each request consumes a token. Allows bursting up to bucket capacity.',
+          'Leaky bucket: requests enter a queue and are processed at a fixed rate — smooths out bursts entirely.',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Implementation considerations',
+        items: [
+          'Where to store counts: in-memory is fastest but not shared across instances — use Redis for distributed rate limiting',
+          'Key to limit on: per user, per IP, per API key, or per endpoint',
+          'Response: return 429 Too Many Requests with a Retry-After header',
+          'Soft vs hard limits: warn users approaching the limit before hard rejecting',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'When to mention in an interview',
+        items: [
+          'Any public-facing API — rate limiting is expected by default',
+          'Login/auth endpoints — prevent brute-force password attacks',
+          'Expensive operations (search, AI inference) — protect cost and performance',
+          'Multi-tenant SaaS — prevent one customer from consuming all capacity',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What HTTP status code should an API return when a client exceeds the rate limit?',
+        options: ['400 Bad Request', '401 Unauthorized', '429 Too Many Requests', '503 Service Unavailable'],
+        answer: 2,
+        explanation: '429 Too Many Requests is the standard code for rate limiting. It should include a Retry-After header telling the client when they can try again.',
+      },
+      {
+        question: 'Why is in-memory rate limiting insufficient for a horizontally scaled API?',
+        options: [
+          'In-memory storage is too slow for rate limiting',
+          'Each server instance tracks its own counter independently, so a client can exceed the real limit by hitting different instances',
+          'In-memory counters are not accurate enough',
+          'Rate limiting must be done at the database layer',
+        ],
+        answer: 1,
+        explanation: 'With 10 servers each allowing 100 req/min, a client could make 1,000 req/min by distributing requests across all instances. Redis provides a shared counter all instances read and write atomically.',
+      },
+      {
+        question: 'What is the main weakness of the fixed window algorithm?',
+        options: [
+          'It is too slow to compute',
+          'It requires too much memory',
+          'A client can double their effective rate by sending requests at the end of one window and the start of the next',
+          'It does not support per-user limits',
+        ],
+        answer: 2,
+        explanation: 'If the window is 1 minute and a client sends 100 requests in the last second of window 1, then 100 more in the first second of window 2, they effectively sent 200 requests in 2 seconds — while technically not violating the rule.',
+      },
+      {
+        question: 'Which algorithm allows controlled bursting while still enforcing an average rate?',
+        options: ['Fixed window', 'Leaky bucket', 'Token bucket', 'Sliding window log'],
+        answer: 2,
+        explanation: 'Token bucket refills at a steady rate but lets tokens accumulate up to the bucket capacity. A client can burst up to the bucket size, then is throttled to the refill rate. Leaky bucket smooths output to a fixed rate with no bursting.',
+      },
+      {
+        question: 'What is the most appropriate rate limiting key for preventing brute-force login attacks?',
+        options: [
+          'Per API key',
+          'Per endpoint globally',
+          'Per IP address or per username',
+          'Per server instance',
+        ],
+        answer: 2,
+        explanation: 'Brute-force attacks come from a specific IP or target a specific username. Limiting per IP blocks attackers from hammering from one machine. Limiting per username prevents distributed attacks on one account across many IPs.',
+      },
+    ],
+  },
+
+  {
+    id: 'sharding-replication',
+    title: 'Sharding & Replication',
+    category: 'systems-design',
+    level: 'intermediate',
+    languages: null,
+    estimatedMinutes: 25,
+    summary: 'Scale databases horizontally with sharding and improve availability with replication.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'As a database grows beyond what a single machine can handle, two primary scaling strategies emerge. Replication copies data to multiple nodes for read scalability and fault tolerance. Sharding (horizontal partitioning) splits data across multiple nodes so each shard owns a subset of the data, allowing both reads and writes to scale.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Replication',
+        items: [
+          'Primary-replica: one primary handles writes; replicas sync and handle reads',
+          'Read scaling: route read-heavy traffic to replicas, freeing the primary',
+          'Replication lag: replicas may be slightly behind — readers can see stale data',
+          'Failover: if the primary fails, a replica is promoted — some data may be lost (RPO)',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Sharding',
+        items: [
+          'Each shard is an independent database holding a subset of rows',
+          'Shard key: the field used to determine which shard owns a record (e.g., user_id)',
+          'Range sharding: shard by value range (A–M on shard 1, N–Z on shard 2) — risk of hot shards',
+          'Hash sharding: hash the key modulo N — distributes load evenly but makes range queries hard',
+          'Directory sharding: a lookup table maps keys to shards — flexible but single point of failure',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Challenges',
+        items: [
+          'Cross-shard queries: joining data across shards requires application-level logic',
+          'Resharding: adding a new shard requires moving data — expensive and disruptive',
+          'Hot shards: if the shard key is poorly chosen, one shard receives all the traffic',
+          'Transactions: ACID transactions across shards are very hard — typically avoided',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the difference between replication and sharding?',
+        options: [
+          'Replication splits data across nodes; sharding copies data to multiple nodes',
+          'Replication copies the same data to multiple nodes; sharding splits data across nodes',
+          'They are different names for the same technique',
+          'Replication is for writes; sharding is for reads',
+        ],
+        answer: 1,
+        explanation: 'Replication: every node has all the data (copies). Sharding: each node has a subset of the data (partitioned). Replication improves read throughput and availability. Sharding improves both read and write throughput by distributing the dataset.',
+      },
+      {
+        question: 'What is replication lag and why does it matter?',
+        options: [
+          'The time it takes to write to the primary database',
+          'The delay between a write on the primary and its appearance on replicas — reads from replicas may return stale data',
+          'The time to promote a replica to primary during failover',
+          'The additional latency caused by having multiple replicas',
+        ],
+        answer: 1,
+        explanation: 'Replication lag means replicas are slightly behind the primary. A user who writes data and immediately reads it back may get the old value if routed to a replica. Systems must handle this with read-your-writes consistency or routing writes to the primary for critical reads.',
+      },
+      {
+        question: 'What is a "hot shard" problem?',
+        options: [
+          'A shard that has become corrupted and overheats the CPU',
+          'A shard that receives a disproportionate amount of traffic because the shard key is poorly chosen',
+          'A shard that is too large and needs to be split',
+          'The first shard in a range-partitioned system',
+        ],
+        answer: 1,
+        explanation: 'Hot shards occur when the shard key is skewed — e.g., sharding by region when 80% of users are in one region. That shard becomes a bottleneck while others are underutilized. Good shard key selection distributes load evenly.',
+      },
+      {
+        question: 'Why are cross-shard joins a problem?',
+        options: [
+          'SQL does not support joins',
+          'Shards use different database engines so their query languages are incompatible',
+          'Data for a single query lives on different machines — the application must fetch from each shard and merge results',
+          'Joins are not needed once data is sharded',
+        ],
+        answer: 2,
+        explanation: 'A database JOIN assumes all data is local. With sharding, related rows may be on different machines. The application must query each shard and merge results in memory — this is slow and complex, which is why schema design should minimize cross-shard access.',
+      },
+      {
+        question: 'What makes hash-based sharding preferable to range-based sharding for write-heavy workloads?',
+        options: [
+          'Hash sharding supports cross-shard transactions',
+          'Hash sharding distributes keys evenly across shards, avoiding hot spots',
+          'Hash sharding makes range queries faster',
+          'Hash sharding requires fewer shards',
+        ],
+        answer: 1,
+        explanation: 'Hashing the key distributes writes evenly regardless of data patterns. Range sharding is predictable but risks hot spots when writes cluster in a narrow range (e.g., auto-incrementing IDs all go to the last shard).',
+      },
+    ],
+  },
+
+  {
+    id: 'cap-theorem',
+    title: 'CAP Theorem & Consistency',
+    category: 'systems-design',
+    level: 'advanced',
+    languages: null,
+    estimatedMinutes: 25,
+    summary: 'Understand the fundamental trade-off between consistency, availability, and partition tolerance in distributed systems.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'The CAP theorem states that a distributed system can guarantee at most two of three properties: Consistency (every read gets the most recent write), Availability (every request gets a response, even if not the latest data), and Partition Tolerance (the system continues operating despite network splits between nodes). Since network partitions are inevitable in distributed systems, the real choice is between CP (consistent under partition) and AP (available under partition).',
+      },
+      {
+        type: 'bullets',
+        heading: 'The three properties',
+        items: [
+          'Consistency: all nodes see the same data at the same time — reads always reflect the latest write',
+          'Availability: every request receives a response (not necessarily the latest data)',
+          'Partition Tolerance: the system continues operating even if nodes cannot communicate',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'CP vs AP systems',
+        items: [
+          'CP (e.g., HBase, Zookeeper, etcd): returns an error or blocks during a partition rather than serve stale data',
+          'AP (e.g., Cassandra, DynamoDB, CouchDB): returns potentially stale data during a partition rather than fail',
+          'CA is not achievable in a real distributed system — partitions always happen',
+          'Traditional single-node SQL is CA — no partition tolerance because there is only one node',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Consistency models (beyond CAP)',
+        items: [
+          'Strong consistency: every read sees the most recent write — expensive, requires coordination',
+          'Eventual consistency: all nodes will converge to the same value given no new writes — fast but may return stale data',
+          'Read-your-writes: a user always sees their own writes — common UX expectation',
+          'Monotonic reads: once a user sees a value, they will not see an older value in a later read',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'According to CAP theorem, what must every distributed system tolerate?',
+        options: [
+          'High latency',
+          'Data loss',
+          'Network partitions',
+          'Hardware failures',
+        ],
+        answer: 2,
+        explanation: 'Network partitions (nodes unable to communicate) are inevitable in any distributed system. Because of this, partition tolerance is not optional — the real design choice is whether to prioritize consistency or availability when a partition occurs.',
+      },
+      {
+        question: 'During a network partition, a CP system will:',
+        options: [
+          'Return potentially stale data to remain available',
+          'Return an error or become unavailable rather than serve inconsistent data',
+          'Automatically heal the partition',
+          'Replicate data faster to compensate',
+        ],
+        answer: 1,
+        explanation: 'CP systems (like ZooKeeper, HBase) choose consistency over availability. Under a partition, they refuse to respond (or return an error) rather than risk serving stale or conflicting data.',
+      },
+      {
+        question: 'Which real-world scenario best suits an AP system?',
+        options: [
+          'A bank transfer that must not double-spend funds',
+          'A distributed lock used for leader election',
+          'A social media "like" count that can be slightly stale',
+          'A medical record that must always reflect the latest update',
+        ],
+        answer: 2,
+        explanation: 'Like counts do not need perfect accuracy — a few seconds of staleness is acceptable. AP systems are a good fit for social features, shopping carts, and DNS. Banking and medical records require CP because staleness can cause real harm.',
+      },
+      {
+        question: 'What is eventual consistency?',
+        options: [
+          'Data is consistent before any write is acknowledged',
+          'All nodes will converge to the same value given enough time with no new writes',
+          'Reads always return the most recent write',
+          'The system is consistent only during business hours',
+        ],
+        answer: 1,
+        explanation: 'Eventual consistency guarantees convergence, not immediacy. Replicas may temporarily diverge after a write, but will all reach the same state eventually. It is the model used by DynamoDB, Cassandra, and DNS.',
+      },
+      {
+        question: 'A user posts a tweet and immediately sees it in their feed. Which consistency guarantee does this require?',
+        options: [
+          'Strong consistency across all nodes',
+          'Read-your-writes consistency',
+          'Monotonic reads',
+          'Linearizability',
+        ],
+        answer: 1,
+        explanation: 'Read-your-writes guarantees that a user always sees their own recent writes, even in an eventually consistent system. This is a weaker guarantee than strong consistency — other users may briefly see the old state, but the author always sees their own update.',
+      },
+    ],
+  },
+
+  {
+    id: 'search-indexing',
+    title: 'Search & Indexing',
+    category: 'systems-design',
+    level: 'advanced',
+    languages: null,
+    estimatedMinutes: 25,
+    summary: 'Build full-text and relevance-ranked search with an inverted index and a dedicated search engine.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Traditional databases use B-tree indexes optimized for exact lookups and range queries. Full-text search — ranking results by relevance, handling typos, and searching across fields — requires a different data structure: the inverted index. Elasticsearch and Apache Solr are the dominant dedicated search engines, both built on Apache Lucene.',
+      },
+      {
+        type: 'bullets',
+        heading: 'How an inverted index works',
+        items: [
+          'Tokenize documents into terms (words), applying normalization (lowercase, stemming)',
+          'Build a map: term → list of document IDs that contain that term (the "posting list")',
+          'At query time: look up each query term, intersect/union the posting lists, rank results',
+          'Far faster than scanning every document — like a book index vs reading every page',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Relevance ranking',
+        items: [
+          'TF-IDF: terms that appear often in a doc but rarely across all docs are more significant',
+          'BM25: the modern default in Elasticsearch — improves on TF-IDF with document length normalization',
+          'Boosting: give certain fields (title, tags) more weight than body text',
+          'Vector search: embed documents and queries as vectors, find nearest neighbours — powers semantic search',
+        ],
+      },
+      {
+        type: 'bullets',
+        heading: 'Architecture pattern',
+        items: [
+          'Primary database (Postgres/MySQL) is the source of truth — never search directly against it',
+          'A sync pipeline (CDC or event stream) propagates writes to the search index',
+          'Elasticsearch cluster handles all search queries',
+          'Index lag: the search index may be seconds or minutes behind the primary — acceptable for most search use cases',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What data structure powers full-text search engines like Elasticsearch?',
+        options: ['B-tree index', 'Hash map', 'Inverted index', 'Trie'],
+        answer: 2,
+        explanation: 'An inverted index maps each term to the list of documents containing it. This allows finding all documents that match a query term in O(1) rather than scanning every document.',
+      },
+      {
+        question: 'Why should you not run full-text search queries directly against your primary database?',
+        options: [
+          'Databases do not support text queries',
+          'Full-text search is computationally expensive and would slow down transactional workloads on the primary',
+          'Search engines are cheaper to operate than databases',
+          'Databases cannot store text data',
+        ],
+        answer: 1,
+        explanation: 'Full-text search queries (LIKE \'%term%\', text scanning) are expensive and do not use standard indexes well. Running them on your primary database competes with transactional workloads. A dedicated search engine handles this load separately.',
+      },
+      {
+        question: 'What is index lag and when is it acceptable?',
+        options: [
+          'The time it takes to build an index from scratch — never acceptable',
+          'The delay between a write to the primary database and its appearance in the search index — acceptable when slight staleness is tolerable',
+          'Slower search performance due to a large index — always a critical issue',
+          'The latency added by relevance ranking — acceptable only for small datasets',
+        ],
+        answer: 1,
+        explanation: 'Index lag is acceptable for most search use cases (e-commerce product search, article search) because users do not need millisecond-fresh results. It is not acceptable when users must immediately search their own recent writes.',
+      },
+      {
+        question: 'What does TF-IDF measure?',
+        options: [
+          'How fast a query executes against the index',
+          'The importance of a term in a document relative to how common it is across all documents',
+          'The total number of documents in the index',
+          'How many fields a document has',
+        ],
+        answer: 1,
+        explanation: 'TF (term frequency) measures how often a term appears in a document. IDF (inverse document frequency) down-weights terms that appear in many documents (like "the"). TF-IDF balances both to score how relevant a term is to a specific document.',
+      },
+      {
+        question: 'What is the role of a sync pipeline between the primary database and a search index?',
+        options: [
+          'To back up the primary database',
+          'To propagate writes from the primary database to the search index so they stay in sync',
+          'To translate SQL queries into search engine queries',
+          'To compress data before storing it in the search index',
+        ],
+        answer: 1,
+        explanation: 'The primary database is the source of truth. Every write must eventually reach the search index. A sync pipeline (using CDC, event streaming, or application-level dual-writes) ensures the index stays up to date without coupling the primary database to search.',
+      },
+    ],
+  },
 ]
