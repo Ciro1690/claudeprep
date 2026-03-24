@@ -35,17 +35,21 @@ export const topics = [
       {
         type: 'code',
         heading: 'Example: Two Sum II (sorted array)',
-        language: 'csharp',
-        snippet: `public int[] TwoSum(int[] numbers, int target) {
-    int left = 0, right = numbers.Length - 1;
-    while (left < right) {
-        int sum = numbers[left] + numbers[right];
-        if (sum == target) return new int[] { left + 1, right + 1 };
-        else if (sum < target) left++;
-        else right--;
-    }
-    return new int[] {};
-}`,
+        language: 'pseudocode',
+        snippet: `function twoSum(numbers, target):
+    left = 0
+    right = length(numbers) - 1
+
+    while left < right:
+        sum = numbers[left] + numbers[right]
+        if sum == target:
+            return [left + 1, right + 1]
+        else if sum < target:
+            left++
+        else:
+            right--
+
+    return []`,
         note: 'Start left at index 0 and right at the last index. If the sum is too small, move left forward. If too large, move right backward.',
       },
       {
@@ -56,6 +60,48 @@ export const topics = [
           'Same direction: both pointers move forward at different speeds (slow/fast or partition)',
           'Always ask: does sorting the input first enable this pattern?',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the main time complexity improvement of the two pointers technique?',
+        options: ['O(n log n) to O(n)', 'O(n²) to O(n)', 'O(n) to O(1)', 'O(n²) to O(log n)'],
+        answer: 1,
+        explanation: 'By using two index variables instead of nested loops, two pointers reduces many O(n²) brute-force solutions to O(n) — each pointer moves at most n steps total.',
+      },
+      {
+        question: 'In the Two Sum II solution on a sorted array, when the current sum is too large, what do you do?',
+        options: ['Move left forward', 'Move right forward', 'Move right backward', 'Move both inward'],
+        answer: 2,
+        explanation: 'Moving the right pointer left picks a smaller value, reducing the sum. Moving left forward would increase the sum further.',
+      },
+      {
+        question: 'Which problem is a classic fit for the opposite-ends two pointer variant?',
+        options: [
+          'Merging two unsorted arrays',
+          'Finding a pair in a sorted array that sums to a target',
+          'Finding the most frequent element',
+          'Counting subarrays with equal 0s and 1s',
+        ],
+        answer: 1,
+        explanation: 'Opposite-ends works when the array is sorted and you need to find a pair meeting a condition. Starting at both ends and moving inward eliminates half the candidates each step.',
+      },
+      {
+        question: 'What is a prerequisite for using two pointers to find a pair with a target sum?',
+        options: [
+          'The array must have no duplicates',
+          'The array must be sorted',
+          'The array must be a string',
+          'The array must have an even number of elements',
+        ],
+        answer: 1,
+        explanation: 'Two pointers on a pair-sum problem rely on sorted order to know which direction to move. On an unsorted array you would need a hash map instead.',
+      },
+      {
+        question: 'Which pattern uses two pointers moving in the same direction at different speeds?',
+        options: ['Palindrome check', 'Sorted pair sum', 'Fast/slow pointer (cycle detection, finding middle)', 'Binary search'],
+        answer: 2,
+        explanation: 'Same-direction pointers (fast moves 2 steps, slow moves 1) are used for cycle detection in linked lists and finding the middle node — not for the opposite-ends sorted-pair pattern.',
       },
     ],
   },
@@ -87,20 +133,19 @@ export const topics = [
       {
         type: 'code',
         heading: 'Example: Longest Substring Without Repeating Characters',
-        language: 'csharp',
-        snippet: `public int LengthOfLongestSubstring(string s) {
-    var seen = new Dictionary<char, int>();
-    int maxLen = 0, left = 0;
+        language: 'pseudocode',
+        snippet: `function lengthOfLongestSubstring(s):
+    seen = {}   // char -> last seen index
+    maxLen = 0
+    left = 0
 
-    for (int right = 0; right < s.Length; right++) {
-        if (seen.ContainsKey(s[right]) && seen[s[right]] >= left)
-            left = seen[s[right]] + 1;
+    for right from 0 to length(s) - 1:
+        if s[right] in seen and seen[s[right]] >= left:
+            left = seen[s[right]] + 1
+        seen[s[right]] = right
+        maxLen = max(maxLen, right - left + 1)
 
-        seen[s[right]] = right;
-        maxLen = Math.Max(maxLen, right - left + 1);
-    }
-    return maxLen;
-}`,
+    return maxLen`,
         note: 'The left pointer only moves right, shrinking the window when a duplicate is found. Window size = right - left + 1.',
       },
       {
@@ -111,6 +156,53 @@ export const topics = [
           'Variable size: expand right until condition is violated, then shrink from left',
           'Track state with a sum, counter, or frequency dictionary',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What type of problem is the sliding window pattern designed for?',
+        options: [
+          'Problems on trees',
+          'Problems involving contiguous subarrays or substrings',
+          'Problems on graphs',
+          'Problems requiring sorted input',
+        ],
+        answer: 1,
+        explanation: 'Sliding window is the pattern of choice whenever a problem asks about a contiguous subarray or substring — max/min sum of size k, longest substring without repeating chars, etc.',
+      },
+      {
+        question: 'In a variable-size window, when do you shrink the window from the left?',
+        options: [
+          'When the right pointer reaches the end of the array',
+          'When the window condition is violated',
+          'When the window size exceeds a fixed limit',
+          'When a duplicate is found anywhere in the array',
+        ],
+        answer: 1,
+        explanation: 'Expand right to add elements, then shrink from left until the condition is restored. The left pointer only ever moves right, so the overall algorithm is O(n).',
+      },
+      {
+        question: 'Given left and right pointer positions, what is the current window size?',
+        options: ['right - left', 'right - left + 1', 'right + left', 'right + left - 1'],
+        answer: 1,
+        explanation: 'A window from index left to right (inclusive) contains right - left + 1 elements. The +1 accounts for the element at the left index itself.',
+      },
+      {
+        question: 'For a fixed-size window sliding one step right, which two operations maintain it?',
+        options: [
+          'Add left element, remove right element',
+          'Add right element, remove left element',
+          'Add both endpoints, then remove both',
+          'Replace left with right without updating state',
+        ],
+        answer: 1,
+        explanation: 'As the window slides right, the new right element enters the window and the old left element leaves. Updating running state incrementally keeps the solution O(n).',
+      },
+      {
+        question: 'What data structure is commonly used to track character frequency in a sliding window substring problem?',
+        options: ['Stack', 'Queue', 'Frequency dictionary / character map', 'Min-heap'],
+        answer: 2,
+        explanation: 'A dictionary mapping each character to its count lets you check window validity in O(1) as the window expands and contracts — essential for problems like "minimum window substring".',
       },
     ],
   },
@@ -142,29 +234,70 @@ export const topics = [
       {
         type: 'code',
         heading: 'Example: Two Sum (unsorted)',
-        language: 'csharp',
-        snippet: `public int[] TwoSum(int[] nums, int target) {
-    var seen = new Dictionary<int, int>(); // value -> index
+        language: 'pseudocode',
+        snippet: `function twoSum(nums, target):
+    seen = {}   // value -> index
 
-    for (int i = 0; i < nums.Length; i++) {
-        int complement = target - nums[i];
-        if (seen.ContainsKey(complement))
-            return new int[] { seen[complement], i };
-        seen[nums[i]] = i;
-    }
-    return new int[] {};
-}`,
+    for i from 0 to length(nums) - 1:
+        complement = target - nums[i]
+        if complement in seen:
+            return [seen[complement], i]
+        seen[nums[i]] = i
+
+    return []`,
         note: 'For each number, check if its complement already exists in the map. This runs in O(n) time and O(n) space.',
       },
       {
         type: 'bullets',
-        heading: 'Common operations in C#',
+        heading: 'Common operations',
         items: [
-          'dict.TryGetValue(key, out val) — safe get without exception',
-          'dict.GetValueOrDefault(key, 0) — get with fallback',
-          'dict.ContainsKey(key) — existence check',
-          'set.Contains(val) — O(1) membership test',
+          'get(key) — retrieve a value by key; signals absence if missing',
+          'get(key, default) — retrieve with a fallback value if key is absent',
+          'contains(key) — O(1) check whether a key exists in the map',
+          'set.contains(val) — O(1) membership test for a hash set',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the average time complexity of a hash map lookup?',
+        options: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'],
+        answer: 2,
+        explanation: 'Hash maps compute a hash of the key to find the bucket directly, giving O(1) average-case for get, put, and delete. Worst case (all keys collide) is O(n) but rare in practice.',
+      },
+      {
+        question: 'In the Two Sum hash map solution, what is stored as the key in the dictionary?',
+        options: ['The index', 'The number itself', 'The complement', 'The target'],
+        answer: 1,
+        explanation: 'The map stores number → index. For each new number you compute complement = target - num and check if that complement is already a key — giving O(1) lookup instead of a second loop.',
+      },
+      {
+        question: 'What is the safest way to retrieve a value that might not exist in a hash map?',
+        options: [
+          'Direct index access — map[key]',
+          'Check for key existence first, then access',
+          'Always access without checking and catch the error',
+          'Use a sorted array instead',
+        ],
+        answer: 1,
+        explanation: 'Check whether the key exists before accessing it (or use a get-with-default method). Directly accessing a missing key typically throws an exception or returns undefined depending on the language.',
+      },
+      {
+        question: 'What trade-off does using a hash map usually make compared to a brute-force nested loop?',
+        options: [
+          'Better time at the cost of more space',
+          'Better space at the cost of more time',
+          'Both time and space improve',
+          'Better time and better space than brute force',
+        ],
+        answer: 0,
+        explanation: 'Hash maps turn O(n²) time (nested loops) into O(n) time by storing previously seen values, but require O(n) extra space for the map. Classic time–space tradeoff.',
+      },
+      {
+        question: 'Which collection should you use when you only need to check membership, not store key-value pairs?',
+        options: ['A hash map (key → value)', 'A sorted list', 'A hash set', 'A stack'],
+        answer: 2,
+        explanation: 'A hash set stores unique elements with O(1) add and membership checks. Using a full hash map just to track presence wastes memory on unnecessary values.',
       },
     ],
   },
@@ -186,18 +319,21 @@ export const topics = [
       {
         type: 'code',
         heading: 'Classic template',
-        language: 'csharp',
-        snippet: `public int BinarySearch(int[] nums, int target) {
-    int left = 0, right = nums.Length - 1;
+        language: 'pseudocode',
+        snippet: `function binarySearch(nums, target):
+    left = 0
+    right = length(nums) - 1
 
-    while (left <= right) {
-        int mid = left + (right - left) / 2; // avoids overflow
-        if (nums[mid] == target) return mid;
-        else if (nums[mid] < target) left = mid + 1;
-        else right = mid - 1;
-    }
-    return -1;
-}`,
+    while left <= right:
+        mid = left + (right - left) / 2   // avoids overflow
+        if nums[mid] == target:
+            return mid
+        else if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1   // not found`,
         note: 'Use left + (right - left) / 2 instead of (left + right) / 2 to prevent integer overflow on large arrays.',
       },
       {
@@ -220,6 +356,48 @@ export const topics = [
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'What is the time complexity of binary search?',
+        options: ['O(n)', 'O(n log n)', 'O(log n)', 'O(1)'],
+        answer: 2,
+        explanation: 'Each iteration halves the remaining search space. Starting from n elements, you need at most log₂(n) iterations to find the target or exhaust the space.',
+      },
+      {
+        question: 'Why calculate mid as `left + (right - left) / 2` instead of `(left + right) / 2`?',
+        options: [
+          'It runs faster on modern hardware',
+          'It avoids integer overflow when left and right are large',
+          'It works on unsorted arrays',
+          'It handles duplicate values more accurately',
+        ],
+        answer: 1,
+        explanation: 'If left and right are both near Int32.MaxValue, their sum overflows. `left + (right - left) / 2` computes the same midpoint arithmetically without the overflow risk.',
+      },
+      {
+        question: 'What condition does the classic binary search while-loop use?',
+        options: ['left < right', 'left <= right', 'left != right', 'right > 0'],
+        answer: 1,
+        explanation: '`left <= right` ensures the single-element case (left == right) is still checked. Using `left < right` would miss this and could return -1 incorrectly when the target is the last remaining element.',
+      },
+      {
+        question: 'When `nums[mid] < target`, what update do you make?',
+        options: ['right = mid', 'left = mid', 'left = mid + 1', 'right = mid - 1'],
+        answer: 2,
+        explanation: 'The target is in the right half, so you move left past mid. Using `left = mid` (without +1) can cause an infinite loop when left and right are adjacent.',
+      },
+      {
+        question: 'What property must the input have for binary search to work correctly?',
+        options: [
+          'Elements must be unique',
+          'Input must be an array, not a list',
+          'Input must be sorted',
+          'Input must be sorted and have no duplicates',
+        ],
+        answer: 2,
+        explanation: 'Binary search relies on sorted order to decide which half to discard. Duplicates are fine — they require extra care only when searching for leftmost/rightmost boundaries.',
+      },
+    ],
   },
 
   {
@@ -239,46 +417,41 @@ export const topics = [
       {
         type: 'code',
         heading: 'DFS: Recursive traversal',
-        language: 'csharp',
-        snippet: `public IList<int> InorderTraversal(TreeNode root) {
-    var result = new List<int>();
-    Dfs(root, result);
-    return result;
-}
+        language: 'pseudocode',
+        snippet: `function inorderTraversal(root):
+    result = []
+    dfs(root, result)
+    return result
 
-private void Dfs(TreeNode node, List<int> result) {
-    if (node == null) return;
-    Dfs(node.left, result);    // left
-    result.Add(node.val);      // root
-    Dfs(node.right, result);   // right
-}`,
+function dfs(node, result):
+    if node == null: return
+    dfs(node.left, result)    // left
+    result.add(node.val)      // root
+    dfs(node.right, result)   // right`,
         note: 'Pre-order: root → left → right. In-order: left → root → right. Post-order: left → right → root.',
       },
       {
         type: 'code',
         heading: 'BFS: Level order traversal',
-        language: 'csharp',
-        snippet: `public IList<IList<int>> LevelOrder(TreeNode root) {
-    var result = new List<IList<int>>();
-    if (root == null) return result;
+        language: 'pseudocode',
+        snippet: `function levelOrder(root):
+    result = []
+    if root == null: return result
 
-    var queue = new Queue<TreeNode>();
-    queue.Enqueue(root);
+    queue = [root]
 
-    while (queue.Count > 0) {
-        int levelSize = queue.Count;
-        var level = new List<int>();
-        for (int i = 0; i < levelSize; i++) {
-            var node = queue.Dequeue();
-            level.Add(node.val);
-            if (node.left != null) queue.Enqueue(node.left);
-            if (node.right != null) queue.Enqueue(node.right);
-        }
-        result.Add(level);
-    }
-    return result;
-}`,
-        note: 'Snapshot queue.Count at the start of each loop to process exactly one level per iteration.',
+    while queue is not empty:
+        levelSize = length(queue)
+        level = []
+        repeat levelSize times:
+            node = queue.dequeue()
+            level.add(node.val)
+            if node.left != null: queue.enqueue(node.left)
+            if node.right != null: queue.enqueue(node.right)
+        result.add(level)
+
+    return result`,
+        note: 'Snapshot the queue size at the start of each outer loop to process exactly one level per iteration.',
       },
       {
         type: 'bullets',
@@ -289,6 +462,58 @@ private void Dfs(TreeNode node, List<int> result) {
           'Recursion naturally expresses DFS — trust the call stack',
           'Always check for null nodes at the start of recursive functions',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'Which data structure does BFS use to track nodes to visit?',
+        options: ['Stack', 'Queue', 'HashSet', 'Priority Queue'],
+        answer: 1,
+        explanation: 'BFS uses a Queue (FIFO). Nodes are enqueued when discovered and dequeued for processing, ensuring every node at depth N is visited before any node at depth N+1.',
+      },
+      {
+        question: 'What is the correct order for in-order DFS traversal of a binary tree?',
+        options: [
+          'Root → Left → Right',
+          'Left → Right → Root',
+          'Left → Root → Right',
+          'Right → Root → Left',
+        ],
+        answer: 2,
+        explanation: 'In-order is Left → Root → Right. For a BST this produces values in sorted ascending order. Pre-order is Root → Left → Right; post-order is Left → Right → Root.',
+      },
+      {
+        question: 'In the BFS level-order template, why do you snapshot `queue.Count` before the inner loop?',
+        options: [
+          'To avoid an infinite loop',
+          'To process exactly the nodes from the current level before moving to the next',
+          'Because Queue.Count is expensive to call repeatedly',
+          'To keep track of the total number of nodes visited',
+        ],
+        answer: 1,
+        explanation: 'Snapshotting levelSize = queue.Count at the start of each outer iteration captures exactly how many nodes are on the current level. The inner loop processes only those, while new children are added for the next level.',
+      },
+      {
+        question: 'Which traversal would you use to find the maximum depth of a binary tree?',
+        options: [
+          'BFS — it visits nodes level by level so depth is naturally tracked',
+          'DFS — recurse to find max(left depth, right depth) + 1',
+          'Either works equally well',
+          'Neither — you need a special algorithm',
+        ],
+        answer: 2,
+        explanation: 'Both work. DFS is usually more concise (return 1 + max(dfs(left), dfs(right))). BFS also works by counting levels. In interviews, DFS is the more common approach for depth problems.',
+      },
+      {
+        question: 'What is the base case for most recursive DFS tree functions?',
+        options: [
+          'When the node has no children',
+          'When node == null',
+          'When the node value equals the target',
+          'When the recursion depth exceeds tree height',
+        ],
+        answer: 1,
+        explanation: 'Checking for null first handles both empty trees and leaf node children uniformly. Without this base case, accessing node.left or node.val on a null reference causes a runtime error.',
       },
     ],
   },
@@ -320,18 +545,19 @@ private void Dfs(TreeNode node, List<int> result) {
       {
         type: 'code',
         heading: 'Example: Climbing Stairs (bottom-up)',
-        language: 'csharp',
-        snippet: `public int ClimbStairs(int n) {
-    if (n <= 2) return n;
+        language: 'pseudocode',
+        snippet: `function climbStairs(n):
+    if n <= 2: return n
 
-    int prev2 = 1, prev1 = 2;
-    for (int i = 3; i <= n; i++) {
-        int curr = prev1 + prev2;
-        prev2 = prev1;
-        prev1 = curr;
-    }
-    return prev1;
-}`,
+    prev2 = 1
+    prev1 = 2
+
+    for i from 3 to n:
+        curr = prev1 + prev2
+        prev2 = prev1
+        prev1 = curr
+
+    return prev1`,
         note: "dp[i] = dp[i-1] + dp[i-2]. You can take 1 or 2 steps, so this is identical to Fibonacci. Space-optimized to O(1) by only tracking the last two values.",
       },
       {
@@ -343,6 +569,63 @@ private void Dfs(TreeNode node, List<int> result) {
           '3. Identify base cases',
           '4. Decide: top-down (easier to write) or bottom-up (often more space-efficient)',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What are the two required properties for dynamic programming to apply?',
+        options: [
+          'Sorted input and unique elements',
+          'Optimal substructure and overlapping subproblems',
+          'Greedy choice property and a polynomial time bound',
+          'A graph structure and a defined start node',
+        ],
+        answer: 1,
+        explanation: 'Optimal substructure means the optimal solution to a problem contains optimal solutions to its subproblems. Overlapping subproblems means the same subproblems are solved repeatedly — which is why caching their results saves work.',
+      },
+      {
+        question: 'In the Climbing Stairs solution, what does dp[i] represent?',
+        options: [
+          'The number of steps taken so far',
+          'The number of distinct ways to reach step i',
+          'The minimum cost to reach step i',
+          'Whether step i has been visited',
+        ],
+        answer: 1,
+        explanation: 'dp[i] is the number of distinct ways to climb to step i. Since you can take 1 or 2 steps, dp[i] = dp[i-1] + dp[i-2] — the same recurrence as Fibonacci.',
+      },
+      {
+        question: 'What is the difference between top-down and bottom-up DP?',
+        options: [
+          'Top-down uses iteration; bottom-up uses recursion',
+          'Top-down uses recursion with a cache; bottom-up fills a table iteratively',
+          'Top-down is always faster; bottom-up uses less memory',
+          'They are identical — just different names for the same approach',
+        ],
+        answer: 1,
+        explanation: 'Top-down (memoization) starts from the original problem, recurses into subproblems, and caches results. Bottom-up (tabulation) starts from the smallest subproblems and builds up to the answer iteratively.',
+      },
+      {
+        question: 'The Climbing Stairs solution tracks only two variables instead of a full dp[] array. What is the benefit?',
+        options: [
+          'It makes the code faster by avoiding array indexing',
+          'It reduces space complexity from O(n) to O(1)',
+          'It allows the solution to handle negative inputs',
+          'It avoids integer overflow',
+        ],
+        answer: 1,
+        explanation: 'Since dp[i] only depends on dp[i-1] and dp[i-2], you only need to keep the last two values. This reduces space from O(n) to O(1) without changing time complexity.',
+      },
+      {
+        question: 'Which of these is the strongest signal that a problem should use DP?',
+        options: [
+          'The input is a sorted array',
+          'The problem asks for the shortest path in a graph',
+          'A brute force recursive solution recomputes the same subproblems many times',
+          'The problem involves choosing between two options at each step',
+        ],
+        answer: 2,
+        explanation: 'Repeated subproblems in a naive recursive solution is the clearest DP signal — you can add memoization directly to that recursion. Choosing between options at each step can hint at DP, but the overlap of subproblems is what makes caching worthwhile.',
       },
     ],
   },
@@ -364,18 +647,18 @@ private void Dfs(TreeNode node, List<int> result) {
       {
         type: 'code',
         heading: 'Reverse a linked list',
-        language: 'csharp',
-        snippet: `public ListNode ReverseList(ListNode head) {
-    ListNode prev = null, curr = head;
+        language: 'pseudocode',
+        snippet: `function reverseList(head):
+    prev = null
+    curr = head
 
-    while (curr != null) {
-        ListNode next = curr.next; // save next
-        curr.next = prev;          // reverse pointer
-        prev = curr;               // advance prev
-        curr = next;               // advance curr
-    }
-    return prev; // new head
-}`,
+    while curr != null:
+        next = curr.next    // save next
+        curr.next = prev    // reverse pointer
+        prev = curr         // advance prev
+        curr = next         // advance curr
+
+    return prev   // new head`,
         note: 'Three pointers: prev, curr, next. Always save next before overwriting curr.next.',
       },
       {
@@ -387,6 +670,58 @@ private void Dfs(TreeNode node, List<int> result) {
           'Reverse: iterative (3-pointer) is cleaner than recursive for interviews',
           'Merge two sorted lists: compare heads, build merged list with pointers',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'After reversing a linked list iteratively, which pointer holds the new head?',
+        options: ['curr', 'next', 'prev', 'head'],
+        answer: 2,
+        explanation: 'When the loop ends, curr is null and prev points to the last node processed — which is the new head of the reversed list.',
+      },
+      {
+        question: 'Why is saving `next = curr.next` the first step in the reversal loop?',
+        options: [
+          'To keep a reference to the rest of the list before overwriting curr.next',
+          'To advance curr forward before updating prev',
+          'To avoid modifying the original list',
+          'To check if we have reached the end of the list',
+        ],
+        answer: 0,
+        explanation: 'Once you set curr.next = prev, the link to the rest of the list is lost. Saving next first ensures you can still advance curr after reversing the pointer.',
+      },
+      {
+        question: 'What problem is the fast/slow pointer pattern classically used to detect?',
+        options: [
+          'Finding the minimum value in a linked list',
+          'Detecting a cycle in a linked list',
+          'Reversing a linked list in-place',
+          'Merging two sorted linked lists',
+        ],
+        answer: 1,
+        explanation: "Floyd's cycle detection: move slow by 1 and fast by 2 each step. If there's a cycle, fast will eventually lap slow and they'll meet. If fast reaches null, there's no cycle.",
+      },
+      {
+        question: 'What is the purpose of a dummy head node?',
+        options: [
+          'To store the length of the list',
+          'To make the list circular',
+          'To simplify edge cases by giving every real node a predecessor',
+          'To speed up traversal with two pointers',
+        ],
+        answer: 2,
+        explanation: 'A dummy head sits before the real head so every node (including the first) has a prev pointer. This removes special-case logic for operations on the head node, like deletion or insertion at the front.',
+      },
+      {
+        question: 'To find the middle node of a linked list in one pass, you should:',
+        options: [
+          'Count all nodes, then traverse to count/2',
+          'Use fast/slow pointers — when fast reaches the end, slow is at the middle',
+          'Convert the list to an array and index the middle',
+          'Use BFS starting from the head',
+        ],
+        answer: 1,
+        explanation: 'Fast moves 2 nodes per step, slow moves 1. When fast reaches the end (or null), slow has covered half the distance — it sits at the middle. This is O(n) time and O(1) space.',
       },
     ],
   },
@@ -408,27 +743,24 @@ private void Dfs(TreeNode node, List<int> result) {
       {
         type: 'code',
         heading: 'BFS for shortest path',
-        language: 'csharp',
-        snippet: `public int ShortestPath(List<List<int>> graph, int src, int dst) {
-    var visited = new HashSet<int> { src };
-    var queue = new Queue<int>();
-    queue.Enqueue(src);
-    int steps = 0;
+        language: 'pseudocode',
+        snippet: `function shortestPath(graph, src, dst):
+    visited = {src}
+    queue = [src]
+    steps = 0
 
-    while (queue.Count > 0) {
-        int size = queue.Count;
-        for (int i = 0; i < size; i++) {
-            int node = queue.Dequeue();
-            if (node == dst) return steps;
-            foreach (int neighbor in graph[node]) {
-                if (visited.Add(neighbor))
-                    queue.Enqueue(neighbor);
-            }
-        }
-        steps++;
-    }
-    return -1;
-}`,
+    while queue is not empty:
+        size = length(queue)
+        repeat size times:
+            node = queue.dequeue()
+            if node == dst: return steps
+            for each neighbor of graph[node]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.enqueue(neighbor)
+        steps++
+
+    return -1   // no path found`,
         note: 'BFS guarantees the shortest path in an unweighted graph. Mark nodes visited when enqueued, not when dequeued, to avoid processing duplicates.',
       },
       {
@@ -495,6 +827,58 @@ Console.WriteLine(p1.X); // 1 — unchanged`,
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'What happens when you assign a struct value to a new variable in C#?',
+        options: [
+          'Both variables point to the same object on the heap',
+          'A copy is made — changing one does not affect the other',
+          'The original is moved and the first variable becomes null',
+          'A reference to the original is stored',
+        ],
+        answer: 1,
+        explanation: 'Structs are value types. Assignment copies all the data into a new location. Mutating the copy leaves the original unchanged.',
+      },
+      {
+        question: 'Which of these is a value type in C#?',
+        options: ['string', 'class instance', 'array', 'struct'],
+        answer: 3,
+        explanation: 'Structs are value types — they store data directly and copy on assignment. Classes, arrays, and strings are reference types (though string behaves immutably).',
+      },
+      {
+        question: 'Why does passing a List<int> to a method and adding to it affect the caller\'s list?',
+        options: [
+          'Because List<T> implements ICloneable automatically',
+          'Because List<T> is a reference type — both variables point to the same object',
+          'Because C# always passes arguments by reference',
+          'Because List<T> uses value semantics by default',
+        ],
+        answer: 1,
+        explanation: 'List<T> is a class (reference type). Passing it to a method passes a copy of the reference, not a copy of the data. Both the caller and the method share the same underlying list.',
+      },
+      {
+        question: 'What is boxing in C#?',
+        options: [
+          'Converting a reference type to a value type',
+          'Converting a value type to an object reference',
+          'Copying a struct to the heap manually',
+          'Wrapping a class in an interface',
+        ],
+        answer: 1,
+        explanation: 'Boxing wraps a value type (e.g., int) in a heap-allocated object so it can be treated as object. It has a performance cost — avoid it in hot paths by using generics instead.',
+      },
+      {
+        question: 'Although string is a reference type, it behaves like a value type because:',
+        options: [
+          'Strings are allocated on the stack',
+          'Strings are immutable — any "modification" creates a new string object',
+          'The compiler inlines string values at compile time',
+          'Strings implement a special copy interface',
+        ],
+        answer: 1,
+        explanation: 'Every string operation that appears to modify a string actually returns a new string. Because strings never change in-place, two variables pointing to the same string can never surprise each other.',
+      },
+    ],
   },
 
   {
@@ -554,6 +938,43 @@ freq.Remove('h');`,
           'Queue<T>: FIFO — use for BFS',
           'SortedDictionary<K,V>: keys always sorted, O(log n) ops',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the time complexity of accessing an element by index in List<T>?',
+        options: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'],
+        answer: 2,
+        explanation: 'List<T> is backed by an array, so index access is O(1) — a direct memory offset calculation. This is one of its main advantages over LinkedList<T>.',
+      },
+      {
+        question: 'What is the standard C# pattern to increment a count in a Dictionary?',
+        options: [
+          'dict[key]++',
+          'dict.Add(key, dict[key] + 1)',
+          'dict[key] = dict.GetValueOrDefault(key, 0) + 1',
+          'dict.Increment(key)',
+        ],
+        answer: 2,
+        explanation: 'GetValueOrDefault(key, 0) returns 0 if the key is absent, so the pattern works whether the key exists or not — no ContainsKey check required.',
+      },
+      {
+        question: 'Which collection keeps its keys in sorted order at all times?',
+        options: ['Dictionary<K,V>', 'List<T>', 'SortedDictionary<K,V>', 'HashSet<T>'],
+        answer: 2,
+        explanation: 'SortedDictionary<K,V> is backed by a red-black tree and maintains keys in sorted order with O(log n) operations. Dictionary<K,V> uses a hash table and has no ordering guarantee.',
+      },
+      {
+        question: 'What is the time complexity of List<T>.Insert(0, value)?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+        answer: 2,
+        explanation: 'Inserting at index 0 shifts every existing element one position right — O(n). Use a LinkedList<T> or Queue<T> if you frequently need O(1) insertions at the front.',
+      },
+      {
+        question: 'Which collection is best for storing unique items and checking membership in O(1)?',
+        options: ['List<T>', 'Dictionary<T, bool>', 'HashSet<T>', 'Queue<T>'],
+        answer: 2,
+        explanation: 'HashSet<T> is purpose-built for unique membership — O(1) add and contains using a hash table. Dictionary<T, bool> achieves the same but wastes memory on the redundant bool values.',
       },
     ],
   },
@@ -616,6 +1037,53 @@ public class Dog : Animal {
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'How many interfaces can a single C# class implement?',
+        options: ['Only one', 'Up to two', 'Any number', 'Only as many as it has abstract methods'],
+        answer: 2,
+        explanation: 'C# supports multiple interface implementation. A class can implement any number of interfaces simultaneously, which is the main way to achieve multiple-inheritance-like behavior.',
+      },
+      {
+        question: 'What is the key difference between an abstract class and an interface?',
+        options: [
+          'Abstract classes support generics; interfaces do not',
+          'Abstract classes can have fields and constructors; interfaces cannot',
+          'Interfaces can have method implementations; abstract classes cannot',
+          'A class can implement multiple abstract classes but only one interface',
+        ],
+        answer: 1,
+        explanation: 'Abstract classes can hold state (fields) and initialization logic (constructors). Interfaces define a contract with no instance state. Note: C# 8+ allows default method bodies in interfaces, but still no instance fields.',
+      },
+      {
+        question: 'Which access modifier makes a member visible only within its own class?',
+        options: ['protected', 'internal', 'private', 'public'],
+        answer: 2,
+        explanation: 'private restricts access to the declaring class only. protected extends that to subclasses. internal extends it to the same assembly. public removes all restrictions.',
+      },
+      {
+        question: 'When would you choose an interface over an abstract class?',
+        options: [
+          'When related classes need to share a base implementation',
+          'When you need to store shared state across subclasses',
+          'When unrelated classes need to share a capability (e.g., IDisposable)',
+          'When you only want one class to implement the contract',
+        ],
+        answer: 2,
+        explanation: 'Interfaces define what a type CAN DO. Use them when unrelated classes need to share a behavior contract. Use abstract classes when you have related types that share implementation and IS-A identity.',
+      },
+      {
+        question: 'In the example, `Dog IS an Animal` and Dog CAN BE IDisposable. What relationship does each describe?',
+        options: [
+          'Both describe inheritance',
+          'Both describe interface implementation',
+          'IS-A is inheritance; CAN-DO is interface implementation',
+          'IS-A is interface implementation; CAN-DO is inheritance',
+        ],
+        answer: 2,
+        explanation: 'IS-A (inheritance) means Dog shares identity and implementation with Animal. CAN-DO (interface) means Dog is capable of a behavior but shares no implementation with other types that implement the same interface.',
+      },
+    ],
   },
 
   {
@@ -674,6 +1142,48 @@ var grouped = nums.GroupBy(n => n % 2 == 0 ? "even" : "odd");`,
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'What does LINQ stand for?',
+        options: [
+          'Language Integrated Query',
+          'Logical Index Query',
+          'List Iteration Query',
+          'Lambda Interface Query',
+        ],
+        answer: 0,
+        explanation: 'LINQ stands for Language Integrated Query — it lets you write query expressions directly in C# code against any IEnumerable source.',
+      },
+      {
+        question: 'What does "deferred execution" mean in LINQ?',
+        options: [
+          'The query runs immediately when defined',
+          'The query runs when you iterate or call a terminal operator like ToList()',
+          'The query runs asynchronously in the background',
+          'The query caches results for reuse',
+        ],
+        answer: 1,
+        explanation: 'LINQ queries are lazy — they describe what to do but do nothing until you iterate the result or call a terminal operator (ToList, Count, First, etc.).',
+      },
+      {
+        question: 'Which LINQ operator flattens a collection of collections into a single sequence?',
+        options: ['Select', 'Aggregate', 'SelectMany', 'Flatten'],
+        answer: 2,
+        explanation: 'SelectMany projects each element to a sequence and merges all resulting sequences into one. Use it when each item contains a nested list you want to combine.',
+      },
+      {
+        question: 'What is the result of `new[] {1,2,3,4,5}.Where(n => n > 3).Count()`?',
+        options: ['1', '2', '3', '4'],
+        answer: 1,
+        explanation: 'Where(n => n > 3) filters to [4, 5] — two elements. Count() then returns 2.',
+      },
+      {
+        question: 'Which LINQ method should you use to deduplicate a sequence?',
+        options: ['Where', 'First', 'Distinct', 'Take'],
+        answer: 2,
+        explanation: 'Distinct() returns each unique element once, in first-seen order. It uses the default equality comparer unless you pass a custom one.',
+      },
+    ],
   },
 
   {
@@ -722,6 +1232,53 @@ public async Task RunBothAsync() {
           'Task.WhenAll runs tasks concurrently; Task.WhenAny returns when the first completes',
           'Use CancellationToken for cancellable long-running operations',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What should an async method return when it produces a value?',
+        options: ['void', 'Task', 'Task<T>', 'IAsyncResult'],
+        answer: 2,
+        explanation: 'An async method that returns a value should return Task<T>. Use Task (no generic) when no value is returned, and avoid async void except for event handlers.',
+      },
+      {
+        question: 'What is the risk of calling `.Result` on a Task inside an async context?',
+        options: [
+          'It does not compile',
+          'It can cause a deadlock',
+          'It returns the wrong type',
+          'It throws a NullReferenceException',
+        ],
+        answer: 1,
+        explanation: '.Result blocks the current thread waiting for the Task. If the Task needs the same thread to complete (common in ASP.NET or UI contexts), the result is a deadlock. Always use await instead.',
+      },
+      {
+        question: 'Which method runs multiple tasks concurrently and waits for ALL to complete?',
+        options: ['Task.WhenAny', 'Task.WhenAll', 'Task.Run', 'Task.Delay'],
+        answer: 1,
+        explanation: 'Task.WhenAll returns a Task that completes when every supplied Task has finished. Task.WhenAny returns as soon as the first Task completes.',
+      },
+      {
+        question: 'What does `await` do when it encounters an incomplete Task?',
+        options: [
+          'Blocks the current thread until done',
+          'Throws an exception',
+          'Suspends the method and releases the thread back to the caller',
+          'Runs the task synchronously on a new thread',
+        ],
+        answer: 2,
+        explanation: 'await suspends the current async method at that point, returns control to the caller, and schedules a continuation to resume when the Task completes — without blocking any thread.',
+      },
+      {
+        question: 'When is `async void` an acceptable return type?',
+        options: [
+          'Service layer methods',
+          'Repository queries',
+          'Event handlers',
+          'Controller actions',
+        ],
+        answer: 2,
+        explanation: 'async void is acceptable only for event handlers because the event system cannot await a Task. In all other cases use async Task so callers can await and observe exceptions.',
       },
     ],
   },
@@ -773,6 +1330,1425 @@ string later = Max("a", "z"); // "z"`,
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'What is the main advantage of generics over using `object`?',
+        options: [
+          'More concise syntax',
+          'Compile-time type safety without boxing or casting',
+          'Support for more data types',
+          'Smaller compiled output',
+        ],
+        answer: 1,
+        explanation: 'Generics preserve type information at compile time. Using object requires casting and causes boxing for value types — generics eliminate both at no runtime cost.',
+      },
+      {
+        question: 'Which constraint requires T to have a parameterless constructor?',
+        options: [
+          'where T : class',
+          'where T : struct',
+          'where T : new()',
+          'where T : IConstructable',
+        ],
+        answer: 2,
+        explanation: 'where T : new() lets you call `new T()` inside the generic method or class. Without this constraint the compiler cannot guarantee T has a parameterless constructor.',
+      },
+      {
+        question: 'What does `where T : IComparable<T>` allow you to do inside the generic method?',
+        options: [
+          'Cast T to int',
+          'Compare T to any object',
+          'Call T\'s CompareTo method',
+          'Use T in LINQ queries',
+        ],
+        answer: 2,
+        explanation: 'The constraint tells the compiler that T implements IComparable<T>, so you can safely call a.CompareTo(b) on values of type T within the method.',
+      },
+      {
+        question: 'Which of these C# collections is NOT generic?',
+        options: ['List<T>', 'Dictionary<K,V>', 'ArrayList', 'HashSet<T>'],
+        answer: 2,
+        explanation: 'ArrayList is from the pre-generics era — it stores elements as object and requires casting. The modern equivalent is List<T>.',
+      },
+      {
+        question: 'Can a single generic type have more than two type parameters?',
+        options: [
+          'No, the maximum is one',
+          'No, the maximum is two',
+          'Yes, any number of type parameters is allowed',
+          'Only if they are all the same underlying type',
+        ],
+        answer: 2,
+        explanation: 'C# generics support any number of type parameters. For example, Action<T1,T2,T3,...> goes up to 16 parameters in the BCL, and you can define your own with as many as needed.',
+      },
+    ],
+  },
+
+  // ─── TYPESCRIPT LANGUAGE FUNDAMENTALS ────────────────────────────────────────
+
+  {
+    id: 'ts-types',
+    title: 'Types & Type Inference',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['typescript'],
+    estimatedMinutes: 15,
+    summary: 'TypeScript adds static types to JavaScript — the compiler catches errors before runtime.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'TypeScript is a superset of JavaScript that adds optional static typing. Type annotations let you declare what kind of value a variable holds. Type inference means the compiler often figures out the type automatically — you only need to annotate when inference falls short.',
+      },
+      {
+        type: 'code',
+        heading: 'Basic types',
+        language: 'typescript',
+        snippet: `// Explicit annotations
+let name: string = 'Alice'
+let age: number = 30
+let active: boolean = true
+
+// Type inference — no annotation needed
+let city = 'London'      // inferred as string
+let count = 0            // inferred as number
+
+// Arrays
+let scores: number[] = [95, 87, 73]
+let tags: string[] = ['ts', 'node']
+
+// Tuple — fixed length, known types at each position
+let point: [number, number] = [1, 2]
+
+// any disables type checking — avoid it
+let data: any = fetchRawData()
+
+// unknown is safer — forces you to narrow before using
+let input: unknown = getUserInput()
+if (typeof input === 'string') console.log(input.toUpperCase())`,
+        note: 'Prefer unknown over any. unknown forces you to check the type before using the value; any skips all checks silently.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Types to know for interviews',
+        items: [
+          'string, number, boolean — the three primitives',
+          'null and undefined — distinct types; use strictNullChecks to catch misuse',
+          'void — return type for functions that return nothing',
+          'never — a function that never returns (throws or infinite loops)',
+          'object — non-primitive; rarely used directly, prefer an interface',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does type inference mean in TypeScript?',
+        options: [
+          'Types are checked only at runtime',
+          'The compiler deduces the type from the assigned value without an explicit annotation',
+          'All variables must be annotated manually',
+          'Types are inferred from function return values only',
+        ],
+        answer: 1,
+        explanation: 'When you write `let x = 5`, TypeScript infers x as number from the initializer. You only need an explicit annotation when inference cannot determine the correct type.',
+      },
+      {
+        question: 'What is the key difference between `any` and `unknown`?',
+        options: [
+          'any is for primitives; unknown is for objects',
+          'unknown requires a type check before you can use the value; any skips all checks',
+          'They are interchangeable — just different names',
+          'any is safer because it accepts more types',
+        ],
+        answer: 1,
+        explanation: 'unknown forces you to narrow the type (e.g., with typeof or instanceof) before calling methods on it. any bypasses the type system entirely, hiding potential runtime errors.',
+      },
+      {
+        question: 'What does `let point: [number, number]` declare?',
+        options: [
+          'An array of any length containing numbers',
+          'An object with two number fields',
+          'A tuple — an array with exactly two numbers at fixed positions',
+          'A union type of number and number',
+        ],
+        answer: 2,
+        explanation: 'Tuple types enforce both the length and the type at each index. [number, number] means exactly two numbers — point[0] and point[1] are both number.',
+      },
+      {
+        question: 'What is the `never` type used for?',
+        options: [
+          'A function that returns undefined',
+          'A variable that has not been assigned yet',
+          'A function that never returns — it always throws or runs infinitely',
+          'An empty array type',
+        ],
+        answer: 2,
+        explanation: 'never represents the type of values that never occur. Common uses: functions that always throw an error, or exhaustive switch cases where TypeScript can prove a branch is unreachable.',
+      },
+      {
+        question: 'Which annotation should you prefer when you do not know the type of an external value?',
+        options: ['any', 'object', 'unknown', 'void'],
+        answer: 2,
+        explanation: 'unknown is the type-safe alternative to any. It tells TypeScript "I do not know the type yet" while still requiring you to narrow it before use, preventing silent runtime errors.',
+      },
+    ],
+  },
+
+  {
+    id: 'ts-interfaces',
+    title: 'Interfaces & Type Aliases',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['typescript'],
+    estimatedMinutes: 15,
+    summary: 'Define the shape of objects with interfaces and type aliases — the foundation of TypeScript design.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Interfaces and type aliases both describe the shape of an object. Interfaces are best for defining contracts that classes can implement or that other interfaces can extend. Type aliases are more flexible — they can name any type, including unions, tuples, and primitives.',
+      },
+      {
+        type: 'code',
+        heading: 'Interface vs type alias',
+        language: 'typescript',
+        snippet: `// Interface
+interface User {
+  id: number
+  name: string
+  email?: string   // optional property
+  readonly createdAt: Date  // cannot be reassigned
+}
+
+// Type alias — equivalent for objects
+type Point = {
+  x: number
+  y: number
+}
+
+// Only type aliases can describe unions
+type ID = string | number
+type Status = 'active' | 'inactive' | 'pending'
+
+// Extending interfaces
+interface Admin extends User {
+  role: string
+}
+
+// Intersection with types
+type AdminUser = User & { role: string }`,
+        note: 'Prefer interface for public APIs and class contracts. Use type for unions, intersections, or when you need to alias a primitive or tuple.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Key differences',
+        items: [
+          'Interfaces can be extended with extends; types use & (intersection)',
+          'Interfaces support declaration merging — define the same interface twice to combine them',
+          'Type aliases can describe any type; interfaces can only describe objects and functions',
+          'For interview purposes: both work for object shapes — pick one and be consistent',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does the `?` after a property name in an interface mean?',
+        options: [
+          'The property is read-only',
+          'The property is optional — it may or may not be present',
+          'The property can be null',
+          'The property type is unknown',
+        ],
+        answer: 1,
+        explanation: 'A trailing ? marks the property as optional. The object satisfies the interface whether or not that property is included.',
+      },
+      {
+        question: 'Which of these can ONLY be expressed with a type alias, not an interface?',
+        options: [
+          'An object with two string properties',
+          'A union type like `string | number`',
+          'An interface that extends another interface',
+          'A readonly property',
+        ],
+        answer: 1,
+        explanation: 'Interfaces can only describe object shapes and function signatures. Union types (A | B), intersections used as standalone aliases, and primitive aliases require type.',
+      },
+      {
+        question: 'What is declaration merging?',
+        options: [
+          'Combining two type aliases into one',
+          'Declaring the same interface name twice — TypeScript merges the two definitions',
+          'Using & to combine two interfaces',
+          'Extending an interface with additional properties',
+        ],
+        answer: 1,
+        explanation: 'If you declare the same interface name in two places, TypeScript merges them into one. This is unique to interfaces — type aliases do not support this and will throw a duplicate identifier error.',
+      },
+      {
+        question: 'How do you make a property in an interface immutable after assignment?',
+        options: [
+          'Mark it with `const`',
+          'Mark it with `readonly`',
+          'Mark it with `final`',
+          'Mark it with `immutable`',
+        ],
+        answer: 1,
+        explanation: 'readonly prevents reassignment of that property after the object is created. It is a compile-time check only — it does not affect the runtime object.',
+      },
+      {
+        question: 'What is the TypeScript equivalent of extending an interface using a type alias?',
+        options: [
+          'type Admin = User extends { role: string }',
+          'type Admin = User & { role: string }',
+          'type Admin = User | { role: string }',
+          'type Admin = User implements { role: string }',
+        ],
+        answer: 1,
+        explanation: 'The & intersection operator combines all properties from both types into one. The resulting type requires every property from User AND the additional role property.',
+      },
+    ],
+  },
+
+  {
+    id: 'ts-functions',
+    title: 'Functions',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['typescript'],
+    estimatedMinutes: 15,
+    summary: 'Type your function parameters and return values to catch errors at compile time.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'TypeScript lets you annotate function parameters and return types. This prevents passing the wrong argument type and ensures callers handle the return value correctly. Optional parameters, default values, and rest parameters all have typed equivalents.',
+      },
+      {
+        type: 'code',
+        heading: 'Typed functions',
+        language: 'typescript',
+        snippet: `// Parameter and return type annotations
+function add(a: number, b: number): number {
+  return a + b
+}
+
+// Optional parameter with ?
+function greet(name: string, greeting?: string): string {
+  return \`\${greeting ?? 'Hello'}, \${name}!\`
+}
+
+// Default parameter
+function repeat(str: string, times: number = 2): string {
+  return str.repeat(times)
+}
+
+// Rest parameters
+function sum(...nums: number[]): number {
+  return nums.reduce((a, b) => a + b, 0)
+}
+
+// Function type as a parameter (callback)
+function transform(values: number[], fn: (n: number) => number): number[] {
+  return values.map(fn)
+}
+
+// Arrow function with type annotation
+const double = (n: number): number => n * 2`,
+        note: 'If a function never returns a value, annotate it as : void. If it always throws, use : never.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Interview tips',
+        items: [
+          'Always annotate function signatures in TypeScript interviews — it shows intentionality',
+          'Use (param?: Type) for optional params; it is safer than passing undefined explicitly',
+          'Prefer explicit return type annotations on public functions for documentation clarity',
+          'Function overloads: declare multiple signatures, then one implementation signature',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does `greeting?: string` mean in a function parameter?',
+        options: [
+          'greeting must be a string or null',
+          'greeting is optional — it can be omitted by the caller',
+          'greeting defaults to an empty string',
+          'greeting is read-only inside the function',
+        ],
+        answer: 1,
+        explanation: 'The ? makes the parameter optional. The caller can omit it entirely. Inside the function, its type is string | undefined, so you must handle the undefined case.',
+      },
+      {
+        question: 'What is the correct TypeScript type for a callback that takes a number and returns a string?',
+        options: [
+          'function(number): string',
+          '(n: number) => string',
+          'callback<number, string>',
+          'Function<number, string>',
+        ],
+        answer: 1,
+        explanation: 'Arrow function syntax is the standard way to type callbacks and function-typed parameters: (paramName: ParamType) => ReturnType.',
+      },
+      {
+        question: 'What return type should you use for a function that performs a side effect and returns nothing?',
+        options: ['undefined', 'null', 'void', 'never'],
+        answer: 2,
+        explanation: 'void indicates the function\'s return value is not meaningful and should not be used. It is different from never — void functions return normally, never functions do not return at all.',
+      },
+      {
+        question: 'Given `function sum(...nums: number[])`, what type is `nums` inside the function?',
+        options: ['number', 'number | undefined', 'number[]', 'readonly number[]'],
+        answer: 2,
+        explanation: 'Rest parameters collect all extra arguments into an array. Inside the function body, nums is a number[] and you can use all array methods on it.',
+      },
+      {
+        question: 'What does a default parameter value do to the required/optional status of that parameter?',
+        options: [
+          'Nothing — you must still pass the argument',
+          'Makes the parameter optional — callers can omit it',
+          'Makes the parameter readonly',
+          'Changes the type to include undefined',
+        ],
+        answer: 1,
+        explanation: 'A parameter with a default value is implicitly optional. If the caller omits it, the default is used. Unlike ?, the type inside the function is just the base type (not | undefined) because the default covers the missing case.',
+      },
+    ],
+  },
+
+  {
+    id: 'ts-generics',
+    title: 'Generics',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['typescript'],
+    estimatedMinutes: 20,
+    summary: 'Write reusable, type-safe functions and components that work across multiple types.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Generics let you write functions and types that work with any type while preserving type information. Without generics you would have to use any and lose all type safety. The type parameter acts as a placeholder filled in at call time.',
+      },
+      {
+        type: 'code',
+        heading: 'Generic functions and constraints',
+        language: 'typescript',
+        snippet: `// Without generics — loses type info
+function first(arr: any[]): any {
+  return arr[0]
+}
+
+// With generics — type is preserved
+function first<T>(arr: T[]): T {
+  return arr[0]
+}
+
+const num = first([1, 2, 3])      // inferred as number
+const str = first(['a', 'b'])     // inferred as string
+
+// Constraint — T must have a .length property
+function longest<T extends { length: number }>(a: T, b: T): T {
+  return a.length >= b.length ? a : b
+}
+
+// Generic interface
+interface ApiResponse<T> {
+  data: T
+  status: number
+  message: string
+}
+
+const res: ApiResponse<User> = await fetchUser(1)
+res.data.name  // typed as User`,
+        note: 'Use extends to constrain what types T can be. Without constraints, TypeScript only knows T is "some type" and will not allow you to access any properties on it.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Common patterns',
+        items: [
+          'T extends keyof U — constrain T to be a key of object type U',
+          'Partial<T> — makes all properties of T optional',
+          'Required<T> — makes all properties required',
+          'Pick<T, K> — pick a subset of properties from T',
+          'Record<K, V> — object type with keys K and values V',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What problem do generics solve compared to using `any`?',
+        options: [
+          'Generics run faster at runtime',
+          'Generics preserve type information so TypeScript can catch errors at compile time',
+          'Generics allow more types to be used',
+          'Generics remove the need for type annotations',
+        ],
+        answer: 1,
+        explanation: 'any silently discards type information. Generics keep the type relationship — if you pass a number[] to first<T>, TypeScript knows the return value is number, not any.',
+      },
+      {
+        question: 'What does `T extends { length: number }` mean as a constraint?',
+        options: [
+          'T must be a subclass of an object',
+          'T must have a length property of type number',
+          'T must be a number',
+          'T must extend the built-in Length class',
+        ],
+        answer: 1,
+        explanation: 'extends in a generic constraint means "T must be assignable to this shape." It does not have to be a class — any type that has a compatible length: number property satisfies it (string, array, etc.).',
+      },
+      {
+        question: 'When you call `first([1, 2, 3])` with `function first<T>(arr: T[]): T`, what is T inferred as?',
+        options: ['any', 'unknown', 'number', 'number[]'],
+        answer: 2,
+        explanation: 'TypeScript infers T from the argument. Since you passed a number[], T is inferred as number, and the return type is number.',
+      },
+      {
+        question: 'What does the built-in `Partial<T>` utility type do?',
+        options: [
+          'Removes all properties from T',
+          'Makes all properties of T optional',
+          'Makes all properties of T readonly',
+          'Picks a subset of properties from T',
+        ],
+        answer: 1,
+        explanation: 'Partial<T> transforms every property in T to be optional (?). Useful for update functions where you only want to pass the fields being changed.',
+      },
+      {
+        question: 'What does `Record<string, number>` represent?',
+        options: [
+          'A tuple of string and number',
+          'An object where keys are strings and values are numbers',
+          'A Map with string keys',
+          'A union of string and number',
+        ],
+        answer: 1,
+        explanation: 'Record<K, V> is shorthand for an object type where all keys are of type K and all values are of type V. Record<string, number> is equivalent to { [key: string]: number }.',
+      },
+    ],
+  },
+
+  {
+    id: 'ts-union-intersection',
+    title: 'Union & Intersection Types',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['typescript'],
+    estimatedMinutes: 20,
+    summary: 'Combine types with | and & to model real-world data that takes multiple shapes.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Union types (A | B) mean a value can be one of several types. Intersection types (A & B) mean a value must satisfy all types simultaneously. Narrowing is how you tell TypeScript which branch of a union you are in so you can access type-specific properties safely.',
+      },
+      {
+        type: 'code',
+        heading: 'Unions, narrowing, and discriminated unions',
+        language: 'typescript',
+        snippet: `// Union type
+type ID = string | number
+
+function printId(id: ID) {
+  if (typeof id === 'string') {
+    console.log(id.toUpperCase())  // TypeScript knows it's string here
+  } else {
+    console.log(id.toFixed(2))     // and number here
+  }
+}
+
+// Discriminated union — a shared literal field acts as a tag
+type Shape =
+  | { kind: 'circle'; radius: number }
+  | { kind: 'rect'; width: number; height: number }
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case 'circle': return Math.PI * shape.radius ** 2
+    case 'rect':   return shape.width * shape.height
+  }
+}
+
+// Intersection — must satisfy both
+type Admin = User & { role: string; permissions: string[] }`,
+        note: 'Discriminated unions are the most powerful pattern — a shared literal field (kind, type, tag) lets TypeScript narrow automatically in switch statements.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Narrowing techniques',
+        items: [
+          'typeof — narrows primitives (string, number, boolean)',
+          'instanceof — narrows class instances',
+          '"property" in obj — narrows by property presence',
+          'Discriminant field — switch on a shared literal property',
+          'Type predicates: function isUser(x): x is User — custom narrowing functions',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does `string | number` mean as a type?',
+        options: [
+          'The value must be both a string and a number',
+          'The value can be either a string or a number',
+          'The value is a string that contains a number',
+          'The value must be converted between string and number',
+        ],
+        answer: 1,
+        explanation: 'The | operator creates a union — the value can be any one of the listed types. TypeScript requires you to narrow before accessing type-specific methods.',
+      },
+      {
+        question: 'What is type narrowing?',
+        options: [
+          'Removing properties from a type',
+          'Checking the type at runtime so TypeScript knows the specific type in that branch',
+          'Converting a wide type to a more specific one permanently',
+          'Casting a type with the as keyword',
+        ],
+        answer: 1,
+        explanation: 'Narrowing is when a runtime check (typeof, instanceof, etc.) tells TypeScript that within a specific code branch, the type is more specific. TypeScript uses control flow analysis to track this.',
+      },
+      {
+        question: 'What makes a discriminated union work?',
+        options: [
+          'All members must have the same properties',
+          'A shared property with a unique literal value on each member acts as a tag',
+          'The union must have exactly two members',
+          'Each member must be a class, not an object type',
+        ],
+        answer: 1,
+        explanation: 'The shared literal field (e.g., kind: \'circle\' vs kind: \'rect\') lets TypeScript automatically narrow the union when you check that field — no manual type assertions needed.',
+      },
+      {
+        question: 'What does the intersection type `A & B` require?',
+        options: [
+          'The value can be either A or B',
+          'The value must satisfy all properties of both A and B',
+          'A and B must be identical types',
+          'A must extend B',
+        ],
+        answer: 1,
+        explanation: '& creates a type that has every property from all intersected types. It is often used to combine an existing type with additional properties without using extends.',
+      },
+      {
+        question: 'Which narrowing technique should you use to distinguish between two different class instances?',
+        options: ['typeof', 'instanceof', '"property" in obj', 'Discriminant field'],
+        answer: 1,
+        explanation: 'instanceof checks whether an object was created by a specific constructor function. typeof only distinguishes primitives (string, number, boolean, etc.).',
+      },
+    ],
+  },
+
+  {
+    id: 'ts-async',
+    title: 'Async/Await & Promises',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['typescript'],
+    estimatedMinutes: 20,
+    summary: 'Type your asynchronous code with Promise<T> and async/await for safe, readable async TypeScript.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'TypeScript fully supports async/await with typed Promises. An async function always returns Promise<T> where T is the type of the resolved value. Proper typing of async code catches errors like forgetting to await and mishandling resolved values.',
+      },
+      {
+        type: 'code',
+        heading: 'Typed async functions',
+        language: 'typescript',
+        snippet: `// Return type is Promise<User>
+async function fetchUser(id: number): Promise<User> {
+  const res = await fetch(\`/api/users/\${id}\`)
+  if (!res.ok) throw new Error('Not found')
+  return res.json() as Promise<User>
+}
+
+// Error handling
+async function safeLoad(id: number): Promise<User | null> {
+  try {
+    return await fetchUser(id)
+  } catch {
+    return null
+  }
+}
+
+// Run multiple requests concurrently
+async function loadDashboard(userId: number) {
+  const [user, posts] = await Promise.all([
+    fetchUser(userId),          // Promise<User>
+    fetchPosts(userId),         // Promise<Post[]>
+  ])
+  return { user, posts }
+}
+
+// Promise.allSettled — doesn't short-circuit on failure
+const results = await Promise.allSettled([fetchA(), fetchB()])
+results.forEach(r => {
+  if (r.status === 'fulfilled') console.log(r.value)
+  else console.error(r.reason)
+})`,
+        note: 'Promise.all rejects if any promise rejects. Use Promise.allSettled when you want all results regardless of individual failures.',
+      },
+      {
+        type: 'bullets',
+        heading: 'TypeScript-specific tips',
+        items: [
+          'An async function returning string has inferred type Promise<string> — no annotation needed',
+          'Use res.json() as Promise<User> to cast untyped fetch responses',
+          'Avoid async void — prefer async (): Promise<void> so errors can be caught',
+          'Type errors in Promise chains show up at compile time with proper generics',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the return type of `async function fetchUser(): Promise<User>`?',
+        options: ['User', 'Promise<User>', 'async<User>', 'Task<User>'],
+        answer: 1,
+        explanation: 'An async function always returns a Promise. The type parameter T in Promise<T> is the type of the value the Promise resolves to — in this case User.',
+      },
+      {
+        question: 'What is the difference between Promise.all and Promise.allSettled?',
+        options: [
+          'Promise.all is faster; Promise.allSettled is more accurate',
+          'Promise.all rejects if any promise rejects; Promise.allSettled waits for all and returns each outcome',
+          'Promise.allSettled only works with typed promises',
+          'They are identical in behavior',
+        ],
+        answer: 1,
+        explanation: 'Promise.all short-circuits — one rejection rejects the whole thing. Promise.allSettled waits for every promise and gives you a result object with status: "fulfilled" or "rejected" for each.',
+      },
+      {
+        question: 'Why should you avoid `async void` as a return type in TypeScript?',
+        options: [
+          'It causes a compile error',
+          'Errors thrown inside an async void function cannot be caught by the caller',
+          'It makes the function synchronous',
+          'void is not a valid Promise type',
+        ],
+        answer: 1,
+        explanation: 'async void functions return a Promise<void> but the caller has no reference to it, so unhandled rejections become silent. Use Promise<void> so callers can await and catch errors.',
+      },
+      {
+        question: 'When you write `const [user, posts] = await Promise.all([fetchUser(), fetchPosts()])`, what happens?',
+        options: [
+          'fetchUser runs, then fetchPosts runs sequentially',
+          'Both requests start concurrently and both must complete before continuing',
+          'The faster request resolves first and the code continues',
+          'TypeScript infers the tuple types from the Promise array',
+        ],
+        answer: 1,
+        explanation: 'Promise.all starts all promises concurrently. Execution continues only when all have resolved. This is more efficient than awaiting each one sequentially.',
+      },
+      {
+        question: 'How do you cast an untyped `fetch` JSON response to a known type?',
+        options: [
+          'const user: User = await res.json()',
+          'const user = res.json() as User',
+          'const user = (User) res.json()',
+          'const user = res.json<User>()',
+        ],
+        answer: 0,
+        explanation: 'Both options A and B work in TypeScript, but `const user: User = await res.json()` is the idiomatic form — it annotates the variable rather than using a type assertion cast, which is slightly safer.',
+      },
+    ],
+  },
+
+  // ─── PYTHON LANGUAGE FUNDAMENTALS ────────────────────────────────────────────
+
+  {
+    id: 'py-data-structures',
+    title: 'Lists, Dicts & Sets',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['python'],
+    estimatedMinutes: 20,
+    summary: 'Python\'s three workhorse collections — master their operations and time complexities.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Python\'s built-in collections handle the majority of interview problems. Lists are ordered dynamic arrays, dicts are hash maps, and sets are hash sets. Knowing their performance characteristics and idiomatic usage is essential.',
+      },
+      {
+        type: 'code',
+        heading: 'Lists',
+        language: 'python',
+        snippet: `nums = [3, 1, 4, 1, 5, 9]
+
+nums.append(2)          # O(1) — add to end
+nums.insert(0, 99)      # O(n) — shifts elements
+nums.pop()              # O(1) — remove last
+nums.pop(0)             # O(n) — remove at index
+nums.remove(1)          # O(n) — remove first occurrence of value
+nums.sort()             # O(n log n) — in-place
+sorted(nums)            # O(n log n) — returns new list
+nums[2]                 # O(1) — index access
+nums[-1]                # O(1) — last element
+nums[1:4]               # O(k) — slicing`,
+        note: 'Use collections.deque for O(1) appends and pops from both ends — list.insert(0, x) and list.pop(0) are O(n).',
+      },
+      {
+        type: 'code',
+        heading: 'Dicts & Sets',
+        language: 'python',
+        snippet: `# Dict — hash map
+freq = {}
+for ch in "hello":
+    freq[ch] = freq.get(ch, 0) + 1   # safe increment
+
+# defaultdict avoids the get() pattern
+from collections import defaultdict
+freq = defaultdict(int)
+for ch in "hello":
+    freq[ch] += 1
+
+# Common dict operations
+d = {'a': 1, 'b': 2}
+d.get('z', 0)        # safe get with default
+'a' in d             # O(1) key check
+d.items()            # key-value pairs
+d.keys(), d.values()
+
+# Set — hash set, O(1) add/contains
+seen = set()
+seen.add(5)
+5 in seen            # O(1)
+seen.discard(5)      # remove if present, no error if absent`,
+        note: 'defaultdict(int) and Counter from collections are the fastest ways to build frequency maps in interview code.',
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the time complexity of `list.pop(0)` in Python?',
+        options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'],
+        answer: 2,
+        explanation: 'Removing from the front of a list shifts every remaining element left — O(n). Use collections.deque for O(1) pops from both ends.',
+      },
+      {
+        question: 'What does `freq.get(ch, 0)` do when `ch` is not in the dictionary?',
+        options: [
+          'Raises a KeyError',
+          'Returns None',
+          'Returns 0 — the default value provided',
+          'Inserts ch with value 0',
+        ],
+        answer: 2,
+        explanation: 'dict.get(key, default) returns the default if the key is absent, without modifying the dict. It is the safe alternative to dict[key] which raises KeyError.',
+      },
+      {
+        question: 'What is the average time complexity of checking membership (`x in s`) for a set?',
+        options: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'],
+        answer: 2,
+        explanation: 'Sets use a hash table. Membership testing is O(1) on average — the same as a dict key lookup. This is why sets are preferred over lists for deduplication and existence checks.',
+      },
+      {
+        question: 'Which collection should you use for O(1) appends and pops from BOTH ends?',
+        options: ['list', 'collections.deque', 'heapq', 'set'],
+        answer: 1,
+        explanation: 'collections.deque is a doubly-ended queue with O(1) appendleft/popleft AND append/pop. list only has O(1) operations at the right end.',
+      },
+      {
+        question: 'What does `defaultdict(int)` do differently from a regular dict?',
+        options: [
+          'It only accepts integer keys',
+          'It automatically initializes missing keys with the default value of the given type (0 for int)',
+          'It sorts keys as integers',
+          'It raises a different error when a key is missing',
+        ],
+        answer: 1,
+        explanation: 'defaultdict calls the provided factory function to create a default value for any missing key. defaultdict(int) initializes missing keys to 0, eliminating the need for .get(key, 0) checks.',
+      },
+    ],
+  },
+
+  {
+    id: 'py-functions',
+    title: 'Functions & Scope',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['python'],
+    estimatedMinutes: 15,
+    summary: 'Master Python\'s flexible function signatures — args, kwargs, defaults, and closures.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Python functions support positional arguments, keyword arguments, default values, *args (variable positional), and **kwargs (variable keyword). Understanding their order and behavior is essential for writing clean, interview-ready Python.',
+      },
+      {
+        type: 'code',
+        heading: 'Function signatures',
+        language: 'python',
+        snippet: `# Default parameter
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+greet("Alice")              # "Hello, Alice!"
+greet("Bob", "Hi")          # "Hi, Bob!"
+greet("Carol", greeting="Hey")  # keyword arg
+
+# *args — variable positional arguments (tuple)
+def add(*nums):
+    return sum(nums)
+
+add(1, 2, 3, 4)  # 10
+
+# **kwargs — variable keyword arguments (dict)
+def config(**options):
+    for key, value in options.items():
+        print(f"{key} = {value}")
+
+config(debug=True, timeout=30)
+
+# Full signature order: positional, *args, keyword-only, **kwargs
+def full(a, b, *args, sep=",", **kwargs):
+    pass
+
+# Lambda — anonymous one-liner
+square = lambda x: x ** 2
+nums.sort(key=lambda x: -x)  # sort descending`,
+        note: 'Default mutable arguments are a classic Python gotcha: def f(lst=[]) shares the same list across all calls. Use def f(lst=None): lst = lst or [] instead.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Closures & scope (LEGB)',
+        items: [
+          'Python resolves names in order: Local → Enclosing → Global → Built-in',
+          'A closure is a function that captures variables from its enclosing scope',
+          'Use nonlocal to assign to an enclosing scope variable (not global)',
+          'Use global to assign to a module-level variable from inside a function',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the classic Python gotcha with mutable default arguments?',
+        options: [
+          'They raise a TypeError at definition time',
+          'The same mutable object is shared across all calls where the default is used',
+          'They cannot be overridden by the caller',
+          'They are copied on each function call, wasting memory',
+        ],
+        answer: 1,
+        explanation: 'Default argument values are evaluated once when the function is defined. If the default is mutable (a list or dict), all calls that use the default share the same object, causing surprising state accumulation.',
+      },
+      {
+        question: 'In `def f(a, b, *args, **kwargs)`, what type is `args` inside the function?',
+        options: ['list', 'tuple', 'dict', 'set'],
+        answer: 1,
+        explanation: '*args collects extra positional arguments into a tuple, not a list. **kwargs collects extra keyword arguments into a dict.',
+      },
+      {
+        question: 'What does the `nonlocal` keyword do?',
+        options: [
+          'Declares a variable as module-level',
+          'Allows a nested function to assign to a variable in its enclosing (non-global) scope',
+          'Prevents a variable from being modified',
+          'Creates a copy of an outer variable inside the nested function',
+        ],
+        answer: 1,
+        explanation: 'Without nonlocal, assigning to a name in a nested function creates a new local variable. nonlocal tells Python to look up the enclosing scope and modify the variable there.',
+      },
+      {
+        question: 'What does `nums.sort(key=lambda x: -x)` do?',
+        options: [
+          'Sorts nums ascending',
+          'Sorts nums descending by negating each value as the sort key',
+          'Sorts nums by absolute value',
+          'Raises an error — sort does not accept a lambda',
+        ],
+        answer: 1,
+        explanation: 'The key function transforms each element for comparison. Using -x reverses the natural ordering, producing a descending sort. Equivalent to nums.sort(reverse=True).',
+      },
+      {
+        question: 'What is Python\'s LEGB rule?',
+        options: [
+          'The order in which Python evaluates boolean expressions',
+          'The order Python searches for a variable name: Local, Enclosing, Global, Built-in',
+          'The order of execution for function arguments',
+          'The precedence of lambda, expression, global, and block scopes',
+        ],
+        answer: 1,
+        explanation: 'When Python encounters a name, it searches scopes in LEGB order. If not found in Local, it checks the Enclosing function scope, then the Global (module) scope, then Built-ins like len and range.',
+      },
+    ],
+  },
+
+  {
+    id: 'py-classes',
+    title: 'Classes & OOP',
+    category: 'language-fundamentals',
+    level: 'beginner',
+    languages: ['python'],
+    estimatedMinutes: 20,
+    summary: 'Define classes, use inheritance, and leverage Python\'s dunder methods for idiomatic OOP.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Python is a multi-paradigm language but supports full object-oriented programming. Classes use __init__ for initialization, self for instance references, and special "dunder" (double underscore) methods to integrate with Python\'s built-in operations.',
+      },
+      {
+        type: 'code',
+        heading: 'Class basics',
+        language: 'python',
+        snippet: `class Animal:
+    # Class variable — shared by all instances
+    count = 0
+
+    def __init__(self, name: str):
+        self.name = name       # instance variable
+        Animal.count += 1
+
+    def speak(self) -> str:
+        raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return f"Animal({self.name!r})"
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Animal) and self.name == other.name
+
+
+class Dog(Animal):
+    def __init__(self, name: str, breed: str):
+        super().__init__(name)  # call parent __init__
+        self.breed = breed
+
+    def speak(self) -> str:
+        return "Woof!"
+
+
+dog = Dog("Rex", "Lab")
+print(dog.speak())       # Woof!
+print(repr(dog))         # Animal('Rex')
+print(Dog.count)         # 1`,
+        note: 'Always call super().__init__() in a subclass __init__ to ensure the parent class is initialized correctly.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Dunder methods to know',
+        items: [
+          '__init__: constructor — initializes a new instance',
+          '__repr__: unambiguous string for debugging — used by repr() and in the REPL',
+          '__str__: human-readable string — used by print() and str()',
+          '__len__: makes len(obj) work',
+          '__eq__ / __lt__: equality and comparison — needed for sorting or using in sets/dicts',
+          '@property: define a getter as an attribute (no parentheses on access)',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the purpose of `self` in a Python class method?',
+        options: [
+          'It is a keyword that refers to the class itself',
+          'It is a convention for the first parameter — it refers to the instance the method is called on',
+          'It is required for static methods',
+          'It automatically calls the parent class method',
+        ],
+        answer: 1,
+        explanation: 'self is just a naming convention for the first parameter of instance methods. Python automatically passes the instance as the first argument when you call obj.method(), binding self to that instance.',
+      },
+      {
+        question: 'What is the difference between a class variable and an instance variable?',
+        options: [
+          'Class variables are private; instance variables are public',
+          'Class variables are shared across all instances; instance variables are unique per instance',
+          'Instance variables are defined in __init__; class variables cannot be modified',
+          'They are identical — just defined in different places',
+        ],
+        answer: 1,
+        explanation: 'A class variable (defined directly on the class) is shared by every instance. An instance variable (set via self.x = ...) belongs to that specific object and does not affect others.',
+      },
+      {
+        question: 'What does `super().__init__(name)` do in a subclass?',
+        options: [
+          'Creates a new instance of the parent class',
+          'Calls the parent class\'s __init__ to initialize inherited state',
+          'Overrides the parent __init__ entirely',
+          'Copies all parent attributes to the subclass',
+        ],
+        answer: 1,
+        explanation: 'super() returns a proxy to the parent class. Calling super().__init__() ensures the parent\'s initialization logic runs, setting up any attributes the parent defines before the subclass adds its own.',
+      },
+      {
+        question: 'Which dunder method should you implement to make `print(obj)` show a human-readable description?',
+        options: ['__repr__', '__str__', '__format__', '__display__'],
+        answer: 1,
+        explanation: '__str__ is called by str() and print(). __repr__ is for unambiguous developer output (used in the REPL and repr()). If only __repr__ is defined, it is used as a fallback for str() too.',
+      },
+      {
+        question: 'What does the `@property` decorator do?',
+        options: [
+          'Makes the method a class method instead of an instance method',
+          'Allows a method to be accessed like an attribute (without parentheses)',
+          'Prevents the attribute from being modified',
+          'Makes the attribute available on the class, not instances',
+        ],
+        answer: 1,
+        explanation: '@property lets you define a getter that is called with attribute syntax (obj.name) instead of method syntax (obj.name()). This is useful for computed properties and controlled access.',
+      },
+    ],
+  },
+
+  {
+    id: 'py-comprehensions',
+    title: 'Comprehensions & Generators',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['python'],
+    estimatedMinutes: 20,
+    summary: 'Write concise, Pythonic transformations with list/dict comprehensions and memory-efficient generators.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Comprehensions are concise, readable expressions for building collections. Generators produce values lazily — one at a time — making them memory-efficient for large sequences. Both are heavily tested in Python interviews as markers of language fluency.',
+      },
+      {
+        type: 'code',
+        heading: 'Comprehensions',
+        language: 'python',
+        snippet: `nums = [1, 2, 3, 4, 5, 6]
+
+# List comprehension
+squares = [x ** 2 for x in nums]               # [1, 4, 9, 16, 25, 36]
+evens   = [x for x in nums if x % 2 == 0]      # [2, 4, 6]
+
+# Dict comprehension
+word_len = {w: len(w) for w in ["hi", "hello"]} # {'hi': 2, 'hello': 5}
+
+# Set comprehension
+unique_mods = {x % 3 for x in nums}            # {0, 1, 2}
+
+# Nested comprehension (flatten a 2D list)
+matrix = [[1, 2], [3, 4], [5, 6]]
+flat = [n for row in matrix for n in row]       # [1, 2, 3, 4, 5, 6]`,
+        note: 'Read nested comprehensions left to right: "for row in matrix" is the outer loop, "for n in row" is the inner loop — the same order as nested for loops.',
+      },
+      {
+        type: 'code',
+        heading: 'Generators',
+        language: 'python',
+        snippet: `# Generator expression — like list comp but lazy (uses parentheses)
+gen = (x ** 2 for x in range(1_000_000))  # no memory allocated yet
+next(gen)   # 0, computed on demand
+
+# Generator function with yield
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+fib = fibonacci()
+print([next(fib) for _ in range(8)])  # [0, 1, 1, 2, 3, 5, 8, 13]
+
+# Using generators with built-ins
+total = sum(x ** 2 for x in range(1000))  # no intermediate list`,
+        note: 'A generator function pauses at each yield, preserving its state. Calling next() resumes from where it left off.',
+      },
+    ],
+    quiz: [
+      {
+        question: 'What is the difference between `[x**2 for x in nums]` and `(x**2 for x in nums)`?',
+        options: [
+          'The parenthesized version creates a tuple',
+          'The parenthesized version creates a generator — values are computed lazily on demand',
+          'They are identical — just different syntax for the same result',
+          'The list version is always faster',
+        ],
+        answer: 1,
+        explanation: 'Square brackets create a list (all values computed immediately). Parentheses create a generator expression (values computed one at a time when iterated). Generators use far less memory for large sequences.',
+      },
+      {
+        question: 'What does the `yield` keyword do in a generator function?',
+        options: [
+          'Returns a value and terminates the function',
+          'Pauses the function and produces a value; resumes from that point on the next call to next()',
+          'Creates a new generator object each time it is reached',
+          'Yields execution to another thread',
+        ],
+        answer: 1,
+        explanation: 'yield suspends the function, returning the value to the caller. The function\'s local state (variables, position) is preserved. The next call to next() resumes execution from right after the yield.',
+      },
+      {
+        question: 'What is the correct reading order for `[n for row in matrix for n in row]`?',
+        options: [
+          'Inner loop first: for n in row, then for row in matrix',
+          'Left to right: outer loop is for row in matrix, inner loop is for n in row',
+          'The order does not matter — Python optimizes it',
+          'Right to left — same as math notation',
+        ],
+        answer: 1,
+        explanation: 'Nested comprehensions read left to right, matching the order of nested for loops. The leftmost for is the outermost loop.',
+      },
+      {
+        question: 'Why would you use a generator expression instead of a list comprehension?',
+        options: [
+          'Generators support filtering with if; list comprehensions do not',
+          'Generators produce values lazily, using O(1) memory instead of O(n)',
+          'Generators are always faster',
+          'List comprehensions cannot be used with built-ins like sum()',
+        ],
+        answer: 1,
+        explanation: 'A generator holds only one value in memory at a time. sum(x**2 for x in range(10**6)) computes the sum without ever materializing the full list — crucial for large datasets.',
+      },
+      {
+        question: 'What does `{w: len(w) for w in words}` produce?',
+        options: [
+          'A set of (word, length) tuples',
+          'A list of lengths',
+          'A dict mapping each word to its length',
+          'A generator of word-length pairs',
+        ],
+        answer: 2,
+        explanation: 'The key: value syntax inside curly braces creates a dict comprehension. The result maps each word string to its integer length.',
+      },
+    ],
+  },
+
+  {
+    id: 'py-decorators',
+    title: 'Decorators',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['python'],
+    estimatedMinutes: 20,
+    summary: 'Wrap functions to add behavior — the pattern behind @property, @staticmethod, and custom decorators.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'A decorator is a function that takes another function and returns a modified version. The @syntax is shorthand for wrapping. Decorators are used throughout Python\'s standard library (@property, @staticmethod, @classmethod) and popular frameworks (Flask\'s @app.route, pytest\'s @pytest.fixture).',
+      },
+      {
+        type: 'code',
+        heading: 'Writing and using decorators',
+        language: 'python',
+        snippet: `import functools
+
+# A simple decorator
+def timer(func):
+    @functools.wraps(func)   # preserves func's name and docstring
+    def wrapper(*args, **kwargs):
+        import time
+        start = time.time()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} took {time.time() - start:.3f}s")
+        return result
+    return wrapper
+
+@timer
+def slow_sum(n):
+    return sum(range(n))
+
+slow_sum(10_000_000)   # prints: slow_sum took 0.312s
+
+# Built-in class decorators
+class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def area(self):           # accessed as circle.area, no ()
+        return 3.14159 * self._radius ** 2
+
+    @staticmethod
+    def unit():               # no self or cls — utility function on the class
+        return Circle(1)
+
+    @classmethod
+    def from_diameter(cls, d):  # cls is the class itself, not an instance
+        return cls(d / 2)`,
+        note: '@functools.wraps preserves the original function\'s __name__ and __doc__. Without it, introspection tools see "wrapper" everywhere instead of the real function name.',
+      },
+      {
+        type: 'bullets',
+        heading: '@staticmethod vs @classmethod',
+        items: [
+          '@staticmethod: no implicit first argument — just a regular function namespaced to the class',
+          '@classmethod: receives cls (the class itself) as the first argument — used for alternative constructors',
+          '@property: turns a method into a read-only attribute; add @x.setter for a writable property',
+          'Decorator stacking: decorators apply bottom-up — @b @a def f() means b(a(f))',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does `@timer` above a function definition do?',
+        options: [
+          'Schedules the function to run after a delay',
+          'Wraps the function — equivalent to `slow_sum = timer(slow_sum)`',
+          'Adds a timer attribute to the function object',
+          'Runs the function immediately when the module loads',
+        ],
+        answer: 1,
+        explanation: '@decorator is syntactic sugar for func = decorator(func). The original function is replaced by whatever the decorator returns — usually a wrapper function.',
+      },
+      {
+        question: 'Why should you use `@functools.wraps(func)` inside a decorator?',
+        options: [
+          'It makes the wrapper function faster',
+          'It preserves the original function\'s __name__ and __doc__ on the wrapper',
+          'It allows the decorator to accept arguments',
+          'It prevents the decorator from being applied more than once',
+        ],
+        answer: 1,
+        explanation: 'Without @functools.wraps, tools that inspect function names (debuggers, logging, help()) see "wrapper" instead of the original name. wraps copies the metadata from the wrapped function onto the wrapper.',
+      },
+      {
+        question: 'What is the key difference between @staticmethod and @classmethod?',
+        options: [
+          '@staticmethod can modify class state; @classmethod cannot',
+          '@classmethod receives the class (cls) as its first argument; @staticmethod receives no implicit argument',
+          '@staticmethod is for public methods; @classmethod is for private methods',
+          'They are identical — just different naming conventions',
+        ],
+        answer: 1,
+        explanation: '@classmethod receives cls, making it useful for alternative constructors (cls(...) creates an instance of whatever class it is called on). @staticmethod is just a namespaced utility function with no access to the class or instance.',
+      },
+      {
+        question: 'How do you access a @property in Python?',
+        options: [
+          'obj.area()',
+          'obj.area — without parentheses, like an attribute',
+          'obj.get_area()',
+          'Circle.area(obj)',
+        ],
+        answer: 1,
+        explanation: '@property makes the method look like a plain attribute to callers. Accessing obj.area invokes the getter function transparently — no parentheses needed.',
+      },
+      {
+        question: 'If a function has `@b` on top and `@a` below it, in what order are the decorators applied?',
+        options: [
+          'Top to bottom: a first, then b',
+          'Bottom to top: a first, then b wraps the result',
+          'Both are applied simultaneously',
+          'The order does not matter',
+        ],
+        answer: 1,
+        explanation: 'Decorators are applied bottom-up. @b @a def f() means f = b(a(f)) — a wraps f first, then b wraps the result of that.',
+      },
+    ],
+  },
+
+  {
+    id: 'py-async',
+    title: 'Async/Await & asyncio',
+    category: 'language-fundamentals',
+    level: 'intermediate',
+    languages: ['python'],
+    estimatedMinutes: 20,
+    summary: 'Write concurrent I/O-bound Python with asyncio\'s async/await model.',
+    sections: [
+      {
+        type: 'paragraph',
+        heading: 'Overview',
+        body: 'Python\'s asyncio library enables concurrent I/O without threads. async def defines a coroutine — a function that can be paused and resumed. await suspends the current coroutine until the awaited coroutine or Future completes, freeing the event loop to run other tasks.',
+      },
+      {
+        type: 'code',
+        heading: 'async/await basics',
+        language: 'python',
+        snippet: `import asyncio
+import aiohttp
+
+# Coroutine — must be awaited to run
+async def fetch(session, url: str) -> str:
+    async with session.get(url) as response:
+        return await response.text()
+
+# Run coroutines concurrently with asyncio.gather
+async def main():
+    urls = ["https://example.com/a", "https://example.com/b"]
+    async with aiohttp.ClientSession() as session:
+        results = await asyncio.gather(
+            *[fetch(session, url) for url in urls]
+        )
+    return results
+
+# Entry point — runs the event loop
+asyncio.run(main())
+
+# asyncio.gather vs asyncio.wait
+# gather — returns results in order, raises on first error
+# wait   — returns sets of done/pending tasks, more control`,
+        note: 'asyncio is single-threaded — it switches between coroutines at each await, not between OS threads. Use it for I/O-bound work (network, files). For CPU-bound work, use multiprocessing.',
+      },
+      {
+        type: 'bullets',
+        heading: 'Key concepts',
+        items: [
+          'Coroutine: defined with async def — calling it returns a coroutine object, not the result',
+          'Event loop: runs coroutines, managed by asyncio.run() at the top level',
+          'await: yields control back to the event loop until the awaitable completes',
+          'asyncio.gather: runs multiple coroutines concurrently and returns results in order',
+          'asyncio.create_task: schedules a coroutine to run without waiting for it immediately',
+        ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does calling an `async def` function return?',
+        options: [
+          'The function\'s return value immediately',
+          'A coroutine object — it does not execute until awaited or scheduled',
+          'A Future object',
+          'A Thread object',
+        ],
+        answer: 1,
+        explanation: 'Calling an async function does not run it. It returns a coroutine object. You must await it (inside another async function) or pass it to asyncio.run() to actually execute it.',
+      },
+      {
+        question: 'What does `await` do when it encounters a coroutine?',
+        options: [
+          'Blocks the entire program until the coroutine completes',
+          'Suspends the current coroutine and gives the event loop a chance to run other tasks',
+          'Runs the coroutine in a new thread',
+          'Converts the coroutine to a synchronous function',
+        ],
+        answer: 1,
+        explanation: 'await pauses the current coroutine and returns control to the event loop, which can then run other ready coroutines. When the awaited task completes, the paused coroutine resumes.',
+      },
+      {
+        question: 'When should you use asyncio instead of threads in Python?',
+        options: [
+          'For CPU-bound tasks like data processing',
+          'For I/O-bound tasks like network requests and file reads',
+          'Whenever you need true parallelism',
+          'asyncio replaces threads in all cases',
+        ],
+        answer: 1,
+        explanation: 'asyncio is ideal for I/O-bound work — while waiting for a network response, the event loop can process other coroutines. For CPU-bound work, use multiprocessing, since the GIL prevents true CPU parallelism with threads or asyncio.',
+      },
+      {
+        question: 'What does `asyncio.gather(coro1, coro2, coro3)` do?',
+        options: [
+          'Runs each coroutine sequentially and returns a list of results',
+          'Runs all coroutines concurrently and returns their results in the same order',
+          'Returns whichever coroutine finishes first',
+          'Creates three separate event loops',
+        ],
+        answer: 1,
+        explanation: 'asyncio.gather schedules all provided coroutines to run concurrently on the same event loop and returns their results in the order the coroutines were passed, regardless of completion order.',
+      },
+      {
+        question: 'What is the correct way to run an async function from synchronous code (the entry point)?',
+        options: [
+          'main()',
+          'await main()',
+          'asyncio.run(main())',
+          'asyncio.start(main)',
+        ],
+        answer: 2,
+        explanation: 'asyncio.run() creates a new event loop, runs the given coroutine until it completes, then closes the loop. It is the standard top-level entry point for asyncio programs.',
+      },
+    ],
   },
 
   // ─── BEHAVIORAL ──────────────────────────────────────────────────────────────
@@ -818,6 +2794,12 @@ string later = Max("a", "z"); // "z"`,
         ],
       },
     ],
+    practiceQuestions: [
+      'Tell me about a time you took ownership of a project or problem that wasn\'t going well.',
+      'Describe a situation where you had to meet a tight deadline. How did you handle it?',
+      'Tell me about a time you had to learn something new quickly to complete a task.',
+      'Give an example of a time you showed initiative beyond what was asked of you.',
+    ],
   },
 
   {
@@ -859,6 +2841,11 @@ string later = Max("a", "z"); // "z"`,
         ],
       },
     ],
+    practiceQuestions: [
+      'Tell me about yourself.',
+      'Walk me through your background and what brought you to apply for this role.',
+      'Tell me about your experience and what you\'re looking for in your next position.',
+    ],
   },
 
   {
@@ -890,6 +2877,12 @@ string later = Max("a", "z"); // "z"`,
           'Giving more than one weakness unless asked',
         ],
       },
+    ],
+    practiceQuestions: [
+      'What\'s your greatest weakness?',
+      'What would your manager say is your biggest area for improvement?',
+      'What\'s a strength you\'re known for? Can you give a specific example?',
+      'How do you handle situations where someone on your team is stronger than you in an area?',
     ],
   },
 
@@ -929,6 +2922,12 @@ string later = Max("a", "z"); // "z"`,
         ],
       },
     ],
+    practiceQuestions: [
+      'Tell me about a time you disagreed with a coworker or manager. How did you handle it?',
+      'Describe a situation where you had to work with a difficult colleague.',
+      'Tell me about a time you had to push back on a decision you thought was wrong.',
+      'Have you ever had to deliver feedback that someone didn\'t want to hear? How did you approach it?',
+    ],
   },
 
   {
@@ -966,6 +2965,12 @@ string later = Max("a", "z"); // "z"`,
           "Don't blame teammates, tools, or circumstances — the question is about you",
         ],
       },
+    ],
+    practiceQuestions: [
+      'Tell me about a time you failed. What happened and what did you learn from it?',
+      'Describe a project that didn\'t go as planned. What would you do differently?',
+      'Tell me about a mistake you made and how you handled it.',
+      'What\'s the biggest professional mistake you\'ve made, and what did it teach you?',
     ],
   },
 
@@ -1016,6 +3021,48 @@ string later = Max("a", "z"); // "z"`,
         ],
       },
     ],
+    quiz: [
+      {
+        question: 'Which HTTP method is used to create a new resource?',
+        options: ['GET', 'PUT', 'POST', 'PATCH'],
+        answer: 2,
+        explanation: 'POST creates a new resource. PUT replaces an existing resource entirely. PATCH applies a partial update. GET retrieves without side effects.',
+      },
+      {
+        question: 'What does "idempotent" mean for an HTTP method?',
+        options: [
+          'It can only be called once per session',
+          'Calling it multiple times with the same input produces the same result',
+          'It always returns the same status code',
+          'It does not modify server state',
+        ],
+        answer: 1,
+        explanation: 'GET, PUT, and DELETE are idempotent — repeating them has the same effect as calling them once. POST is not idempotent — calling it twice creates two resources.',
+      },
+      {
+        question: 'What status code indicates a resource was successfully created?',
+        options: ['200 OK', '201 Created', '204 No Content', '202 Accepted'],
+        answer: 1,
+        explanation: '201 Created is returned when a POST successfully creates a new resource. The response often includes the new resource or a Location header pointing to it.',
+      },
+      {
+        question: 'Which URL follows REST best practices?',
+        options: ['/getUser?id=123', '/user/delete/123', '/users/123', '/fetchUserById/123'],
+        answer: 2,
+        explanation: 'REST uses nouns (resources) in URLs and relies on the HTTP method to express the action. /users/123 with DELETE deletes; with GET retrieves — the URL stays clean.',
+      },
+      {
+        question: 'What is the difference between PUT and PATCH?',
+        options: [
+          'PUT creates a resource; PATCH updates it',
+          'PUT replaces the entire resource; PATCH applies a partial update',
+          'PUT is not idempotent; PATCH is',
+          'They are interchangeable in REST',
+        ],
+        answer: 1,
+        explanation: 'PUT replaces the full resource — omitted fields are removed. PATCH only updates the fields you send. Use PATCH when you want to change one field without resending the entire object.',
+      },
+    ],
   },
 
   {
@@ -1062,6 +3109,53 @@ string later = Max("a", "z"); // "z"`,
           'Know indexing: an index speeds up reads but slows writes and uses space',
           'Know the N+1 query problem: fetching a list, then querying each item individually',
         ],
+      },
+    ],
+    quiz: [
+      {
+        question: 'What does ACID stand for in database transactions?',
+        options: [
+          'Arrays, Columns, Indexes, Data',
+          'Atomicity, Consistency, Isolation, Durability',
+          'Atomicity, Concurrency, Integrity, Durability',
+          'Access, Control, Integrity, Design',
+        ],
+        answer: 1,
+        explanation: 'ACID guarantees that transactions are all-or-nothing (Atomic), leave the DB in a valid state (Consistent), don\'t interfere with each other (Isolated), and survive crashes (Durable).',
+      },
+      {
+        question: 'Which database type is better suited for complex JOINs across multiple related entities?',
+        options: ['NoSQL document store', 'Key-value store', 'SQL (relational)', 'Wide-column store'],
+        answer: 2,
+        explanation: 'SQL databases are designed around normalized, relational data with foreign keys and JOIN operations. NoSQL stores generally lack multi-table JOINs and favor denormalized, document-oriented data.',
+      },
+      {
+        question: 'What scaling approach do SQL databases favor?',
+        options: ['Horizontal sharding by default', 'Vertical scaling', 'Eventual consistency', 'Replication-first'],
+        answer: 1,
+        explanation: 'SQL databases scale vertically (bigger machine) most naturally. Horizontal sharding is possible but complex because relational queries can span shard boundaries. NoSQL databases are designed to scale horizontally from the start.',
+      },
+      {
+        question: 'What is the N+1 query problem?',
+        options: [
+          'Running the same query N times in a loop accidentally',
+          'Fetching a list with one query, then making an additional query for each item',
+          'Using N indexes on the same table',
+          'A query that requires N JOIN operations',
+        ],
+        answer: 1,
+        explanation: 'N+1 means 1 query to fetch a list of N items, then N individual queries to fetch related data for each item. Fix it with a JOIN or eager-loading to get all data in 1-2 queries.',
+      },
+      {
+        question: 'In a system design interview, when should you default to a SQL database?',
+        options: [
+          'When you need to store unstructured documents',
+          'When horizontal scaling at massive scale is the primary concern',
+          'Unless you have a clear reason to use NoSQL',
+          'Only when the entire dataset fits on one machine',
+        ],
+        answer: 2,
+        explanation: 'SQL is the safe default — it\'s well-understood, ACID-compliant, and handles most use cases well. Choose NoSQL when you have specific reasons: extreme write throughput, flexible schemas, or global distribution requirements.',
       },
     ],
   },

@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useProgress } from '../../hooks/useProgress'
 import { topics } from '../../data/curriculum/topics'
 import { categories } from '../../data/curriculum/categories'
 import ClaudeChat from '../../components/ClaudeChat'
+import Quiz from '../../components/Quiz'
+import BehavioralPractice from '../../components/BehavioralPractice'
+import TranslatableCode from '../../components/TranslatableCode'
 
 export default function TopicPage() {
   const { categoryId, topicId } = useParams()
@@ -13,6 +16,17 @@ export default function TopicPage() {
 
   const topic = topics.find(t => t.id === topicId && t.category === categoryId)
   const category = categories.find(c => c.id === categoryId)
+
+  useEffect(() => {
+    if (!topic) return
+    const key = 'claudeprep_visited'
+    const prev = JSON.parse(localStorage.getItem(key) ?? '[]')
+    const updated = [
+      { topicId: topic.id, categoryId: topic.category },
+      ...prev.filter(v => v.topicId !== topic.id),
+    ].slice(0, 20)
+    localStorage.setItem(key, JSON.stringify(updated))
+  }, [topic?.id, topic?.category])
 
   if (!topic) {
     navigate(`/study/${categoryId}`, { replace: true })
@@ -53,11 +67,14 @@ export default function TopicPage() {
 
         <div className="space-y-8">
           {topic.sections.map((section, i) => (
-            <Section key={i} section={section} />
+            <Section key={i} section={section} topic={topic} translatable={topic.languages === null} />
           ))}
         </div>
 
         <ClaudeChat topic={topic} />
+
+        {topic.quiz && <Quiz topic={topic} />}
+        {topic.practiceQuestions && <BehavioralPractice topic={topic} />}
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex items-center justify-between">
           <Link
@@ -91,7 +108,7 @@ export default function TopicPage() {
   )
 }
 
-function Section({ section }) {
+function Section({ section, topic, translatable }) {
   return (
     <div>
       {section.heading && (
@@ -111,19 +128,23 @@ function Section({ section }) {
         </ul>
       )}
       {section.type === 'code' && (
-        <div className="rounded-lg overflow-hidden border border-gray-800">
-          <div className="bg-gray-900 px-4 py-2 flex items-center border-b border-gray-800">
-            <span className="text-xs text-gray-500 font-mono">{section.language}</span>
-          </div>
-          <pre className="bg-gray-950 px-4 py-4 overflow-x-auto text-sm font-mono text-gray-200 leading-relaxed">
-            <code>{section.snippet}</code>
-          </pre>
-          {section.note && (
-            <div className="bg-gray-900 px-4 py-3 border-t border-gray-800">
-              <p className="text-xs text-gray-400 leading-relaxed">💡 {section.note}</p>
+        translatable
+          ? <TranslatableCode section={section} topic={topic} />
+          : (
+            <div className="rounded-lg overflow-hidden border border-gray-800">
+              <div className="bg-gray-900 px-4 py-2 flex items-center border-b border-gray-800">
+                <span className="text-xs text-gray-500 font-mono">{section.language}</span>
+              </div>
+              <pre className="bg-gray-950 px-4 py-4 overflow-x-auto text-sm font-mono text-gray-200 leading-relaxed">
+                <code>{section.snippet}</code>
+              </pre>
+              {section.note && (
+                <div className="bg-gray-900 px-4 py-3 border-t border-gray-800">
+                  <p className="text-xs text-gray-400 leading-relaxed">💡 {section.note}</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          )
       )}
     </div>
   )

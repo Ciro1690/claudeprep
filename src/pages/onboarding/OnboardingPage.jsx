@@ -1,33 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { SiJavascript, SiPython, SiOpenjdk, SiCplusplus, SiSharp, SiGo } from 'react-icons/si'
+import { SiPython, SiSharp, SiTypescript } from 'react-icons/si'
 
 const LANGUAGES = [
-  { id: 'javascript', label: 'JavaScript', Icon: SiJavascript, color: '#F7DF1E' },
-  { id: 'python', label: 'Python', Icon: SiPython, color: '#3776AB' },
-  { id: 'java', label: 'Java', Icon: SiOpenjdk, color: '#ED8B00' },
-  { id: 'cpp', label: 'C++', Icon: SiCplusplus, color: '#00599C' },
-  { id: 'csharp', label: 'C#', Icon: SiSharp, color: '#239120' },
-  { id: 'go', label: 'Go', Icon: SiGo, color: '#00ACD7' },
-]
-
-const LEVELS = [
-  {
-    id: 'beginner',
-    label: 'Beginner',
-    description: 'Learning fundamentals, < 1 year of experience',
-  },
-  {
-    id: 'intermediate',
-    label: 'Intermediate',
-    description: 'Solid foundations, 1–4 years of experience',
-  },
-  {
-    id: 'advanced',
-    label: 'Advanced',
-    description: 'Optimizing solutions, 5+ years of experience',
-  },
+  { id: 'csharp',     label: 'C#',         Icon: SiSharp,      color: '#239120' },
+  { id: 'python',     label: 'Python',     Icon: SiPython,     color: '#3776AB' },
+  { id: 'typescript', label: 'TypeScript', Icon: SiTypescript, color: '#3178C6' },
 ]
 
 export default function OnboardingPage() {
@@ -37,12 +16,11 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(isGuest ? 2 : 1)
   const [handle, setHandle] = useState(isGuest ? 'Guest' : '')
   const [language, setLanguage] = useState(null)
-  const [experience, setExperience] = useState(null)
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (profile?.language && profile?.experience) {
+    if (profile?.language) {
       navigate('/dashboard', { replace: true })
     }
   }, [profile, navigate])
@@ -50,7 +28,7 @@ export default function OnboardingPage() {
   async function handleFinish() {
     setError(null)
     setSaving(true)
-    const { error } = await updateProfile({ handle: handle.trim() || null, language, experience })
+    const { error } = await updateProfile({ handle: handle.trim() || null, language })
     if (error) {
       setError(error.message)
       setSaving(false)
@@ -59,12 +37,14 @@ export default function OnboardingPage() {
     }
   }
 
+  const steps = isGuest ? [2] : [1, 2]
+
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
       <div className="w-full max-w-lg">
         {/* Progress */}
         <div className="flex items-center gap-2 mb-10">
-          {(isGuest ? [2, 3] : [1, 2, 3]).map(n => (
+          {steps.map(n => (
             <div
               key={n}
               className={`h-1 flex-1 rounded-full transition-colors ${
@@ -86,18 +66,12 @@ export default function OnboardingPage() {
           <StepLanguage
             selected={language}
             setSelected={setLanguage}
-            onBack={isGuest ? null : () => setStep(1)}
-            onNext={() => setStep(3)}
-          />
-        )}
-        {step === 3 && (
-          <StepExperience
-            selected={experience}
-            setSelected={setExperience}
+            isGuest={isGuest}
             error={error}
             saving={saving}
-            onBack={() => setStep(2)}
+            onBack={isGuest ? null : () => setStep(1)}
             onFinish={handleFinish}
+            stepLabel={isGuest ? null : 'Step 2 of 2'}
           />
         )}
       </div>
@@ -108,7 +82,7 @@ export default function OnboardingPage() {
 function StepHandle({ handle, setHandle, email, onNext }) {
   return (
     <div>
-      <p className="text-sm text-blue-400 font-medium mb-2">Step 1 of 3</p>
+      <p className="text-sm text-blue-400 font-medium mb-2">Step 1 of 2</p>
       <h2 className="text-2xl font-bold text-white mb-1">What should we call you?</h2>
       <p className="text-gray-400 text-sm mb-8">
         Choose a display name, or we'll use your email.
@@ -131,10 +105,10 @@ function StepHandle({ handle, setHandle, email, onNext }) {
   )
 }
 
-function StepLanguage({ selected, setSelected, onBack, onNext }) {
+function StepLanguage({ selected, setSelected, isGuest, error, saving, onBack, onFinish, stepLabel }) {
   return (
     <div>
-      <p className="text-sm text-blue-400 font-medium mb-2">Step 2 of 3</p>
+      {stepLabel && <p className="text-sm text-blue-400 font-medium mb-2">{stepLabel}</p>}
       <h2 className="text-2xl font-bold text-white mb-1">Primary language</h2>
       <p className="text-gray-400 text-sm mb-8">
         Which language will you use for coding problems?
@@ -155,6 +129,11 @@ function StepLanguage({ selected, setSelected, onBack, onNext }) {
           </button>
         ))}
       </div>
+      {error && (
+        <div className="bg-red-950 border border-red-800 text-red-300 px-4 py-3 rounded-lg text-sm mb-4">
+          {error}
+        </div>
+      )}
       <div className="flex gap-3">
         {onBack && (
           <button
@@ -164,56 +143,6 @@ function StepLanguage({ selected, setSelected, onBack, onNext }) {
             ← Back
           </button>
         )}
-        <button
-          onClick={onNext}
-          disabled={!selected}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors"
-        >
-          Continue →
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function StepExperience({ selected, setSelected, error, saving, onBack, onFinish }) {
-  return (
-    <div>
-      <p className="text-sm text-blue-400 font-medium mb-2">Step 3 of 3</p>
-      <h2 className="text-2xl font-bold text-white mb-1">Experience level</h2>
-      <p className="text-gray-400 text-sm mb-8">
-        This helps us tailor the difficulty of problems and explanations.
-      </p>
-      <div className="space-y-3 mb-6">
-        {LEVELS.map(level => (
-          <button
-            key={level.id}
-            onClick={() => setSelected(level.id)}
-            className={`w-full text-left px-4 py-4 rounded-lg border transition-colors ${
-              selected === level.id
-                ? 'border-blue-500 bg-blue-950'
-                : 'border-gray-800 bg-gray-900 hover:border-gray-600'
-            }`}
-          >
-            <p className={`font-medium ${selected === level.id ? 'text-white' : 'text-gray-200'}`}>
-              {level.label}
-            </p>
-            <p className="text-sm text-gray-400 mt-0.5">{level.description}</p>
-          </button>
-        ))}
-      </div>
-      {error && (
-        <div className="bg-red-950 border border-red-800 text-red-300 px-4 py-3 rounded-lg text-sm mb-4">
-          {error}
-        </div>
-      )}
-      <div className="flex gap-3">
-        <button
-          onClick={onBack}
-          className="flex-1 border border-gray-700 hover:border-gray-500 text-gray-300 font-medium py-2.5 rounded-lg transition-colors"
-        >
-          ← Back
-        </button>
         <button
           onClick={onFinish}
           disabled={!selected || saving}

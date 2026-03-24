@@ -24,11 +24,10 @@ export default function TopicsPage() {
     return null
   }
 
-  const userLevelIndex = LEVEL_ORDER.indexOf(profile?.experience ?? 'beginner')
   const available = topics.filter(t => {
     if (t.category !== categoryId) return false
     if (t.languages && !t.languages.includes(profile?.language)) return false
-    return LEVEL_ORDER.indexOf(t.level) <= userLevelIndex
+    return true
   })
 
   const byLevel = LEVEL_ORDER.reduce((acc, level) => {
@@ -64,11 +63,13 @@ export default function TopicsPage() {
 
         {available.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
-            <p className="text-lg mb-1">No topics available yet</p>
+            <p className="text-lg mb-1">No topics available</p>
             <p className="text-sm">
-              {category.languageSpecific
-                ? `We're working on ${profile?.language} content.`
-                : 'Check back soon.'}
+              {category.languageSpecific && !profile?.language
+                ? 'Set your language in Settings to see topics here.'
+                : category.languageSpecific
+                  ? `We're working on ${profile?.language} content.`
+                  : 'Check back soon.'}
             </p>
           </div>
         ) : (
@@ -110,6 +111,11 @@ export default function TopicsPage() {
                         </div>
                         <div className="flex items-center gap-3 ml-4 shrink-0">
                           <span className="text-xs text-gray-600">{topic.estimatedMinutes} min</span>
+                          {topic.quiz && (
+                            <span className="text-xs px-2 py-0.5 rounded-full border border-blue-800 bg-blue-950 text-blue-400">
+                              quiz
+                            </span>
+                          )}
                           <span className={`text-xs px-2 py-0.5 rounded-full border capitalize ${LEVEL_COLORS[topic.level]}`}>
                             {topic.level}
                           </span>
