@@ -13,7 +13,7 @@ import TopicPage from './pages/study/TopicPage'
 import SettingsPage from './pages/settings/SettingsPage'
 
 const router = createBrowserRouter([
-  { path: '/', element: <Navigate to="/dashboard" replace /> },
+  { path: '/', element: <Navigate to="/login" replace /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignupPage /> },
   {

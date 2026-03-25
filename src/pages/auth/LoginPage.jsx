@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (user) navigate('/dashboard', { replace: true })
+    if (user && !user.is_anonymous) navigate('/dashboard', { replace: true })
   }, [user, navigate])
 
   async function handleSubmit(e) {
@@ -109,7 +109,7 @@ export default function LoginPage() {
         </div>
 
         <button
-          onClick={async () => { await signOut(); const { error } = await signInAsGuest(); if (error) setError(error.message) }}
+          onClick={async () => { await signOut(); const { error } = await signInAsGuest(); if (error) setError(error.message); else navigate('/onboarding', { replace: true }) }}
           className="w-full border border-gray-700 hover:border-gray-500 text-gray-400 hover:text-gray-200 font-medium py-2.5 rounded-lg transition-colors text-sm"
         >
           Continue as guest
