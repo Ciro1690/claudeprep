@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import ReactMarkdown from 'react-markdown'
+import { canMakeRequest, recordRequest } from '../lib/rateLimit'
+import AiErrorDisplay, { parseAiError } from './AiErrorDisplay'
 
 export default function ClaudeChat({ topic }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([]) // { role: 'user'|'assistant', content: string }
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null) // null | { type: 'rate_limited'|'capacity'|'generic', message?: string }
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -19,19 +21,25 @@ export default function ClaudeChat({ topic }) {
     const text = input.trim()
     if (!text || loading) return
 
+    if (!canMakeRequest()) {
+      setError({ type: 'rate_limited' })
+      return
+    }
+
     const userMessage = { role: 'user', content: text }
     const updatedMessages = [...messages, userMessage]
     setMessages(updatedMessages)
     setInput('')
     setError(null)
     setLoading(true)
+    recordRequest()
 
     const { data, error: fnError } = await supabase.functions.invoke('quick-processor', {
       body: { topic, messages: updatedMessages },
     })
 
     if (fnError || data?.error) {
-      setError(fnError?.message ?? data?.error ?? 'Something went wrong.')
+      setError(parseAiError(fnError, data))
     } else {
       setMessages(prev => [...prev, { role: 'assistant', content: data.content }])
     }
@@ -84,7 +92,7 @@ export default function ClaudeChat({ topic }) {
               </div>
             )}
             {error && (
-              <p className="text-xs text-red-400 text-center">{error}</p>
+              <AiErrorDisplay type={error.type} message={error.message} />
             )}
             <div ref={bottomRef} />
           </div>

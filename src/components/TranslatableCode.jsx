@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { canMakeRequest, recordRequest } from '../lib/rateLimit'
+import { parseAiError } from './AiErrorDisplay'
 
 const LANG_LABELS = { pseudocode: 'Pseudocode', csharp: 'C#', python: 'Python', typescript: 'TypeScript' }
 const SUPPORTED = ['csharp', 'python', 'typescript']
@@ -23,8 +25,15 @@ export default function TranslatableCode({ section, topic }) {
       setShowTranslated(true)
       return
     }
+
+    if (!canMakeRequest()) {
+      setError('Rate limit reached. Try again in an hour.')
+      return
+    }
+
     setLoading(true)
     setError(null)
+    recordRequest()
 
     const { data, error: fnError } = await supabase.functions.invoke('quick-processor', {
       body: {
@@ -37,7 +46,8 @@ export default function TranslatableCode({ section, topic }) {
     })
 
     if (fnError || data?.error) {
-      setError('Translation failed.')
+      const { type } = parseAiError(fnError, data)
+      setError(type === 'capacity' ? 'At capacity — try again later.' : type === 'rate_limited' ? 'Hourly limit reached.' : 'Translation failed.')
     } else {
       setTranslated(data.content.trim())
       setShowTranslated(true)

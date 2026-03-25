@@ -53,6 +53,7 @@ export default function Quiz({ topic }) {
     const finalScore = score
     const finalResult = { score: finalScore, total: questions.length }
     setResult(finalResult)
+    setStarted(false)
     localStorage.setItem(storageKey(topic.id), JSON.stringify(finalResult))
 
     if (user) {

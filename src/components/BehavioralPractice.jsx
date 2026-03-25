@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import ReactMarkdown from 'react-markdown'
+import { canMakeRequest, recordRequest } from '../lib/rateLimit'
+import AiErrorDisplay, { parseAiError } from './AiErrorDisplay'
 
 export default function BehavioralPractice({ topic }) {
   const [selected, setSelected] = useState(null)
   const [answer, setAnswer] = useState('')
   const [feedback, setFeedback] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null) // null | { type: 'rate_limited'|'capacity'|'generic', message?: string }
 
   const questions = topic.practiceQuestions
 
@@ -16,9 +18,15 @@ export default function BehavioralPractice({ topic }) {
     const text = answer.trim()
     if (!text || loading) return
 
+    if (!canMakeRequest()) {
+      setError({ type: 'rate_limited' })
+      return
+    }
+
     setLoading(true)
     setFeedback(null)
     setError(null)
+    recordRequest()
 
     const isSystemsDesign = topic.category === 'systems-design'
 
@@ -48,7 +56,7 @@ Please give me specific, actionable coaching on how to strengthen this answer. C
     })
 
     if (fnError || data?.error) {
-      setError(fnError?.message ?? data?.error ?? 'Something went wrong.')
+      setError(parseAiError(fnError, data))
     } else {
       setFeedback(data.content)
     }
@@ -111,7 +119,7 @@ Please give me specific, actionable coaching on how to strengthen this answer. C
                 className="w-full bg-gray-950 border border-gray-700 text-white placeholder-gray-600 rounded-lg px-4 py-3 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50 resize-none"
               />
             </div>
-            {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+            {error && <div className="mb-3"><AiErrorDisplay type={error.type} message={error.message} /></div>}
             <div className="flex justify-end">
               <button
                 type="submit"
