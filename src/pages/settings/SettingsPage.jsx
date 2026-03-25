@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { SiPython, SiSharp, SiTypescript } from 'react-icons/si'
 
@@ -11,6 +11,7 @@ const LANGUAGES = [
 
 export default function SettingsPage() {
   const { profile, updateProfile } = useAuth()
+  const navigate = useNavigate()
   const [handle, setHandle] = useState(profile?.handle ?? '')
   const [language, setLanguage] = useState(profile?.language ?? null)
   const [saving, setSaving] = useState(false)
@@ -88,6 +89,15 @@ export default function SettingsPage() {
         >
           {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save changes'}
         </button>
+
+        {saved && (
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white font-medium py-2.5 rounded-lg transition-colors"
+          >
+            Go to dashboard →
+          </button>
+        )}
       </main>
     </div>
   )

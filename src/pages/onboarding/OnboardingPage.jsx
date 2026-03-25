@@ -14,7 +14,7 @@ export default function OnboardingPage() {
   const navigate = useNavigate()
   const isGuest = user?.is_anonymous
   const [step, setStep] = useState(isGuest ? 2 : 1)
-  const [handle, setHandle] = useState(isGuest ? 'Guest' : '')
+  const [handle, setHandle] = useState('')
   const [language, setLanguage] = useState(null)
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
